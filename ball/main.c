@@ -93,6 +93,7 @@ static int loop(void)
 
 	int d = 1;
 
+	u32 held = keysHeld();
 	u32 down = keysDown();
 	u32 up = keysUp();
 
@@ -101,6 +102,8 @@ static int loop(void)
 
 	if (!config_get_pause())
 	{
+		touchPosition touch;
+
 		if (down)
 			d = st_keybd(down, 1);
 		if (down & KEY_A)
@@ -113,13 +116,12 @@ static int loop(void)
 			st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_Y), -JOY_MAX);
 		if (down & KEY_DOWN)
 			st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_Y), +JOY_MAX);
-		if (down & KEY_TOUCH)
+		if (held & KEY_TOUCH || down & KEY_TOUCH)
 		{
-			touchPosition touch;
 			touchRead(&touch);
-
 			st_point(touch.px, -touch.py + config_get_d(CONFIG_HEIGHT), 0, 0);
-			d = st_click(-1, 1);
+			if (down & KEY_TOUCH)
+				d = st_click(-1, 1);
 		}
 
 		if (up)

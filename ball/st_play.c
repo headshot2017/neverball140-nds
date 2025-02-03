@@ -28,6 +28,8 @@
 /*---------------------------------------------------------------------------*/
 
 static int view_rotate;
+static int touchX;
+static int held;
 
 /*---------------------------------------------------------------------------*/
 
@@ -180,6 +182,8 @@ static int play_loop_enter(void)
 
     game_set_fly(0.f);
     view_rotate = 0;
+    touchX = 0;
+    held = 0;
 
     return id;
 }
@@ -233,6 +237,9 @@ static void play_loop_timer(int id, float dt)
 static void play_loop_point(int id, int x, int y, int dx, int dy)
 {
     game_set_pos(dx, dy);
+    touchX = x;
+    if (held)
+        view_rotate = (touchX < config_get_d(CONFIG_WIDTH)/2) ? -1 : 1;
 }
 
 static void play_loop_stick(int id, int a, int k)
@@ -245,7 +252,8 @@ static void play_loop_stick(int id, int a, int k)
 
 static int play_loop_click(int b, int d)
 {
-    view_rotate = d ? b : 0;
+    held = d;
+    if (!d) view_rotate = 0;
     return 1;
 }
 
