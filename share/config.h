@@ -152,9 +152,9 @@ enum {
 #define DEFAULT_JOYSTICK_CAMERA_1    5
 #define DEFAULT_JOYSTICK_CAMERA_2    6
 #define DEFAULT_JOYSTICK_CAMERA_3    7
-#define DEFAULT_KEY_CAMERA_1         KEY_Y
-#define DEFAULT_KEY_CAMERA_2         KEY_B
-#define DEFAULT_KEY_CAMERA_3         KEY_A
+#define DEFAULT_KEY_CAMERA_1         KEY_X
+#define DEFAULT_KEY_CAMERA_2         KEY_Y
+#define DEFAULT_KEY_CAMERA_3         KEY_B
 #define DEFAULT_KEY_CAMERA_R         KEY_R
 #define DEFAULT_KEY_CAMERA_L         KEY_L
 #define DEFAULT_VIEW_FOV             50
