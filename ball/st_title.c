@@ -224,23 +224,23 @@ static int title_buttn(int b, int d)
 static int help_enter(void)
 {
     const char *s0 =
-        "Move the mouse or joystick to tilt the floor\\"
+        "Use the D-Pad to tilt the floor\\"
         "causing the ball to roll.  Roll over coins to\\"
         "collect them.  Collect coins to unlock the goal\\"
         "and finish the level.  Earn an extra ball for\\"
         "each 100 coins collected.\\";
 
-    const char *s4 = "Left and right mouse buttons rotate the view.";
-    const char *s5 = "Hold Shift for faster view rotation.";
+    const char *s4 = "L and R shoulder buttons rotate the view.";
+    //const char *s5 = "Hold Shift for faster view rotation.";
     const char *s6 = "Pause / Release Pointer";
     const char *s7 = "Exit / Cancel Menu";
     const char *s8 = "Chase View";
     const char *s9 = "Lazy View";
     const char *sA = "Manual View";
-    const char *sB = "Comments?  Problems?  robert.kooima@gmail.com";
+    const char *sB = "https://github.com/headshot2017/neverball140-nds";
 
-    const char *k0 = "Spacebar";
-    const char *k1 = "Escape";
+    const char *k0 = "SELECT";
+    const char *k1 = "START";
 	/*
     const char *k2 = SDL_GetKeyName(config_get_d(CONFIG_KEY_CAMERA_1));
     const char *k3 = SDL_GetKeyName(config_get_d(CONFIG_KEY_CAMERA_2));
@@ -285,7 +285,7 @@ static int help_enter(void)
 
         gui_space(id);
         gui_label(id, s4, GUI_SML, GUI_TOP, gui_wht, gui_wht);
-        gui_label(id, s5, GUI_SML, GUI_BOT, gui_wht, gui_wht);
+        //gui_label(id, s5, GUI_SML, GUI_BOT, gui_wht, gui_wht);
         gui_space(id);
         gui_label(id, sB, GUI_SML, GUI_ALL, gui_wht, gui_wht);
 
