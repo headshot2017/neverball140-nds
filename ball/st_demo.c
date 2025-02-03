@@ -182,8 +182,8 @@ static int demo_click(int b, int d)
 
 static int demo_keybd(int c, int d)
 {
-    //if (d && c == SDLK_ESCAPE)
-        //goto_state(&st_title);
+    if (d && c & KEY_START)
+        goto_state(&st_title);
     return 1;
 }
 
@@ -260,8 +260,8 @@ static void demo_play_timer(int id, float dt)
 
 static int demo_play_keybd(int c, int d)
 {
-    //if (d && c == SDLK_ESCAPE)
-        //goto_state(&st_demo_end);
+    if (d && c & KEY_START)
+        goto_state(&st_demo_end);
     return 1;
 }
 
@@ -335,8 +335,7 @@ static void demo_end_timer(int id, float dt)
 
 static int demo_end_keybd(int c, int d)
 {
-    //return (d && c == SDLK_ESCAPE) ? demo_end_action(DEMO_KEEP) : 1;
-	return 1;
+    return (d && c & KEY_START) ? demo_end_action(DEMO_KEEP) : 1;
 }
 
 static void demo_end_point(int id, int x, int y, int dx, int dy)
@@ -422,8 +421,7 @@ static void demo_del_timer(int id, float dt)
 
 static int demo_del_keybd(int c, int d)
 {
-    //return (d && c == SDLK_ESCAPE) ? demo_del_action(DEMO_KEEP) : 1;
-	return 1;
+    return (d && c & KEY_START) ? demo_end_action(DEMO_KEEP) : 1;
 }
 
 static void demo_del_point(int id, int x, int y, int dx, int dy)

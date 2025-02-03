@@ -163,8 +163,8 @@ static int done_click(int b, int d)
 
 static int done_keybd(int c, int d)
 {
-    //if (d && c == SDLK_ESCAPE)
-        //goto_state(&st_title);
+    if (d && c & KEY_START)
+        goto_state(&st_title);
     return 1;
 }
 

@@ -122,8 +122,8 @@ static void fall_out_timer(int id, float dt)
 
 static int fall_out_keybd(int c, int d)
 {
-    //if (d && c == SDLK_ESCAPE)
-        //goto_state(&st_over);
+    if (d && c & KEY_START)
+        goto_state(&st_over);
     return 1;
 }
 
@@ -210,8 +210,8 @@ static void time_out_timer(int id, float dt)
 
 static int time_out_keybd(int c, int d)
 {
-    //if (d && c == SDLK_ESCAPE)
-        //goto_state(&st_over);
+    if (d && c & KEY_START)
+        goto_state(&st_over);
     return 1;
 }
 

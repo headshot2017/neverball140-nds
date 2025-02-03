@@ -158,8 +158,8 @@ static int save_click(int b, int d)
 
 static int save_keybd(int c, int d)
 {
-    //if (d && c == SDLK_ESCAPE)
-        //goto_state(&st_over);
+    if (d && c & KEY_START)
+        goto_state(&st_over);
     return 1;
 }
 
@@ -233,8 +233,7 @@ static void clobber_timer(int id, float dt)
 
 static int clobber_keybd(int c, int d)
 {
-    //return (d && c == SDLK_ESCAPE) ? clobber_action(SAVE_CANCEL) : 1;
-	return 1;
+    return (d && c & KEY_START) ? clobber_action(SAVE_CANCEL) : 1;
 }
 
 static void clobber_point(int id, int x, int y, int dx, int dy)

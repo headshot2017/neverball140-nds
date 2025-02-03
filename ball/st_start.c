@@ -212,8 +212,8 @@ static int start_click(int b, int d)
 
 static int start_keybd(int c, int d)
 {
-    //if (d && c == SDLK_ESCAPE)
-        //return goto_state(&st_title);
+    if (d && c & KEY_START)
+        return goto_state(&st_title);
 
 	/*
     if (d && c == SDLK_F12)

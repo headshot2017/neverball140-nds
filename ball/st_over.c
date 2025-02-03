@@ -66,8 +66,7 @@ static void over_timer(int id, float dt)
 
 static int over_keybd(int c, int d)
 {
-    //return (d && c == SDLK_ESCAPE) ? goto_state(&st_title) : 1;
-	return 1;
+    return (d && c & KEY_START) ? goto_state(&st_title) : 1;
 }
 
 static int over_click(int b, int d)

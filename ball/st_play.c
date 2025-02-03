@@ -282,8 +282,8 @@ static int play_loop_keybd(int c, int d)
             view_rotate = 0;
     }
 
-    //if (d && c == SDLK_ESCAPE)
-        //goto_state(&st_over);
+    if (d && c & KEY_START)
+        goto_state(&st_over);
     //if (d && c == SDLK_F12)
         //goto_state(&st_look);
     return 1;

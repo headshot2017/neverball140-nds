@@ -96,23 +96,33 @@ static int loop(void)
 	u32 down = keysDown();
 	u32 up = keysUp();
 
-	if (down & KEY_A)
-		d = st_buttn(config_get_d(CONFIG_JOYSTICK_BUTTON_A), 1);
-	if (down & KEY_LEFT)
-		st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_X), -JOY_MAX);
-	if (down & KEY_RIGHT)
-		st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_X), +JOY_MAX);
-	if (down & KEY_UP)
-		st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_Y), -JOY_MAX);
-	if (down & KEY_DOWN)
-		st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_Y), +JOY_MAX);
+	if (down & KEY_SELECT)
+		config_tgl_pause();
 
-	if (up & KEY_A)
-		d = st_buttn(config_get_d(CONFIG_JOYSTICK_BUTTON_A), 0);
-	if (up & KEY_LEFT || up & KEY_RIGHT)
-		st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_X), 1);
-	if (up & KEY_DOWN || up & KEY_UP)
-		st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_Y), 1);
+	if (!config_get_pause())
+	{
+		if (down & KEY_A)
+			d = st_buttn(config_get_d(CONFIG_JOYSTICK_BUTTON_A), 1);
+		if (down & KEY_LEFT)
+			st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_X), -JOY_MAX);
+		if (down & KEY_RIGHT)
+			st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_X), +JOY_MAX);
+		if (down & KEY_UP)
+			st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_Y), -JOY_MAX);
+		if (down & KEY_DOWN)
+			st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_Y), +JOY_MAX);
+		if (down)
+			d = st_keybd(down, 1);
+
+		if (up & KEY_A)
+			d = st_buttn(config_get_d(CONFIG_JOYSTICK_BUTTON_A), 0);
+		if (up & KEY_LEFT || up & KEY_RIGHT)
+			st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_X), 1);
+		if (up & KEY_DOWN || up & KEY_UP)
+			st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_Y), 1);
+		if (up)
+			d = st_keybd(up, 0);
+	}
 
 	return d;
 

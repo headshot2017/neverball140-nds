@@ -72,8 +72,8 @@ static int level_click(int b, int d)
 
 static int level_keybd(int c, int d)
 {
-    //if (d && c == SDLK_ESCAPE)
-        //goto_state(&st_over);
+    if (d && c & KEY_START)
+        goto_state(&st_over);
     //if (d && c == SDLK_F12)
         //goto_state(&st_poser);
     return 1;
@@ -100,8 +100,7 @@ static void poser_paint(int id, float st)
 
 static int poser_keybd(int c, int d)
 {
-    //return (d && c == SDLK_ESCAPE) ? goto_state(&st_level) : 1;
-	return 1;
+    return (d && c & KEY_START) ? goto_state(&st_level) : 1;
 }
 
 /*---------------------------------------------------------------------------*/

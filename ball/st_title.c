@@ -246,9 +246,9 @@ static int help_enter(void)
     const char *k3 = SDL_GetKeyName(config_get_d(CONFIG_KEY_CAMERA_2));
     const char *k4 = SDL_GetKeyName(config_get_d(CONFIG_KEY_CAMERA_3));
 	*/
-	const char *k2 = "Y";
-	const char *k3 = "B";
-	const char *k4 = "A";
+	const char *k2 = "X";
+	const char *k3 = "Y";
+	const char *k4 = "B";
 
     int id, jd;
 
