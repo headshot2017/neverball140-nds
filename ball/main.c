@@ -113,6 +113,14 @@ static int loop(void)
 			st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_Y), -JOY_MAX);
 		if (down & KEY_DOWN)
 			st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_Y), +JOY_MAX);
+		if (down & KEY_TOUCH)
+		{
+			touchPosition touch;
+			touchRead(&touch);
+
+			st_point(touch.px, -touch.py + config_get_d(CONFIG_HEIGHT), 0, 0);
+			d = st_click(-1, 1);
+		}
 
 		if (up)
 			d = st_keybd(up, 0);
@@ -122,6 +130,8 @@ static int loop(void)
 			st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_X), 1);
 		if (up & KEY_DOWN || up & KEY_UP)
 			st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_Y), 1);
+		if (up & KEY_TOUCH)
+			d = st_click(-1, 0);
 	}
 
 	return d;
