@@ -37,7 +37,7 @@ struct part
 static struct part part_coin[PART_MAX_COIN];
 static struct part part_goal[PART_MAX_GOAL];
 static int         part_text;
-//static GLuint      part_list;
+static uint32_t*   part_list;
 
 /*---------------------------------------------------------------------------*/
 
@@ -86,29 +86,35 @@ void part_init(float h)
     memset(part_goal, 0, PART_MAX_GOAL * sizeof (struct part));
 
     part_text = make_image_from_file(NULL, NULL, NULL, NULL, IMG_PART);
-    //part_list = glGenLists(1);
+	int W, H;
+	glGetInt(GL_GET_TEXTURE_WIDTH, &W);
+	glGetInt(GL_GET_TEXTURE_HEIGHT, &H);
 
-	/*
-    glNewList(part_list, GL_COMPILE);
-    {
-        glBegin(GL_QUADS);
-        {
-            glTexCoord2f(0.f, 0.f);
-            glVertex2f(-PART_SIZE, -PART_SIZE);
+	v16 V16_PART_SIZE = floattov16(PART_SIZE / SCALE_VERTICES);
 
-            glTexCoord2f(1.f, 0.f);
-            glVertex2f(+PART_SIZE, -PART_SIZE);
+	part_list = (uint32_t*)malloc(sizeof(uint32_t) * 16);
+	part_list[0] = 0;
+	uint32_t S = part_list[0];
 
-            glTexCoord2f(1.f, 1.f);
-            glVertex2f(+PART_SIZE, +PART_SIZE);
+	part_list[++S] = FIFO_COMMAND_PACK(FIFO_BEGIN, FIFO_NOP, FIFO_NOP, FIFO_NOP);
+	part_list[++S] = GL_QUADS;
 
-            glTexCoord2f(0.f, 1.f);
-            glVertex2f(-PART_SIZE, +PART_SIZE);
-        }
-        glEnd();
-    }
-    glEndList();
-	*/
+	part_list[++S] = FIFO_COMMAND_PACK(FIFO_TEX_COORD, FIFO_VERTEX16, FIFO_TEX_COORD, FIFO_VERTEX_XY);
+	part_list[++S] = TEXTURE_PACK(0, 0);
+	part_list[++S] = VERTEX_PACK(-V16_PART_SIZE, -V16_PART_SIZE);
+	part_list[++S] = VERTEX_PACK(0, 0);
+	part_list[++S] = TEXTURE_PACK(inttot16(W), 0);
+	part_list[++S] = VERTEX_PACK(+V16_PART_SIZE, -V16_PART_SIZE);
+
+	part_list[++S] = FIFO_COMMAND_PACK(FIFO_TEX_COORD, FIFO_VERTEX_XY, FIFO_TEX_COORD, FIFO_VERTEX_XY);
+	part_list[++S] = TEXTURE_PACK(inttot16(W), inttot16(H));
+	part_list[++S] = VERTEX_PACK(+V16_PART_SIZE, +V16_PART_SIZE);
+	part_list[++S] = TEXTURE_PACK(0, inttot16(H));
+	part_list[++S] = VERTEX_PACK(-V16_PART_SIZE, +V16_PART_SIZE);
+
+	part_list[++S] = FIFO_COMMAND_PACK(FIFO_END, FIFO_NOP, FIFO_NOP, FIFO_NOP);
+
+	part_list[0] = S;
 
     part_reset(h);
 }
@@ -118,10 +124,12 @@ void part_free(void)
 	/*
     if (glIsList(part_list))
         glDeleteLists(part_list, 1);
-
-    if (glIsTexture(part_text))
 	*/
+
+    //if (glIsTexture(part_text))
         glDeleteTextures(1, &part_text);
+	free(part_list);
+	part_list = 0;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -217,23 +225,7 @@ static void part_draw(const float p[3], const uint8_t c[3],
         //glColor4f(c[0], c[1], c[2], a);
         glColor3b(c[0], c[1], c[2]);
 
-        //glCallList(part_list);
-		glBegin(GL_QUADS);
-        {
-			float S = PART_SIZE / SCALE_VERTICES;
-            glTexCoord2f(0.f, 0.f);
-            glVertex3f(-S, -S, 0);
-
-            glTexCoord2f(1.f, 0.f);
-            glVertex3f(+S, -S, 0);
-
-            glTexCoord2f(1.f, 1.f);
-            glVertex3f(+S, +S, 0);
-
-            glTexCoord2f(0.f, 1.f);
-            glVertex3f(-S, +S, 0);
-        }
-        glEnd();
+        glCallList(part_list);
     }
     glPopMatrix(1);
 }

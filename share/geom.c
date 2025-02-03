@@ -30,12 +30,10 @@
 
 static uint32_t* ball_list;
 static int ball_text;
-static int ball_b;
 
 void ball_init(int b)
 {
     char name[MAXSTR];
-	ball_b = b;
 	int slices = b ? 32 : 16;
     int stacks = b ? 16 :  8;
 
@@ -218,11 +216,11 @@ void ball_draw(void)
 /*---------------------------------------------------------------------------*/
 
 //static GLuint mark_list;
-static int mark_b;
+//static int mark_b;
 
 void mark_init(int b)
 {
-	mark_b = b;
+	//mark_b = b;
 	/*
 	int i, slices = b ? 32 : 16;
 
@@ -294,7 +292,6 @@ void mark_free(void)
 
 static int coin_text;
 static uint32_t* coin_list;
-static int coin_b;
 
 static uint32_t coin_head(int n, float radius, float thick, uint32_t* list, int w, int h)
 {
@@ -470,7 +467,6 @@ void coin_init(int b)
 {
 	char name[MAXSTR];
 	int n = b ? 32 : 8;
-	coin_b = n;
 
 	config_get_s(CONFIG_COIN, name, MAXSTR);
 
@@ -547,61 +543,51 @@ void coin_pull(void)
 /*---------------------------------------------------------------------------*/
 
 static uint32_t* goal_list;
-static int goal_b;
 
 void goal_init(int b)
 {
-	goal_b = b ? 32 : 8;
+	int n = b ? 32 : 8;
 
-	/*
-	goal_list = glGenLists(1);
+	goal_list = (uint32_t*)malloc(sizeof(uint32_t) * 128);
+	goal_list[0] = 0;
+	uint32_t S = goal_list[0];
 
-	glNewList(goal_list, GL_COMPILE);
+	goal_list[++S] = FIFO_COMMAND_PACK(FIFO_TEX_FORMAT, FIFO_PAL_FORMAT, FIFO_POLY_FORMAT, FIFO_BEGIN);
+	goal_list[++S] = 0;
+	goal_list[++S] = 0;
+	goal_list[++S] = POLY_ALPHA(16) | POLY_CULL_BACK;
+	goal_list[++S] = GL_QUAD_STRIP;
+
+	for (int i = 0; i <= n; i++)
 	{
-		glPushAttrib(GL_TEXTURE_BIT  |
-					 GL_LIGHTING_BIT |
-					 GL_DEPTH_BUFFER_BIT);
-		{
-			glEnable(GL_COLOR_MATERIAL);
-			glDisable(GL_LIGHTING);
-			glDisable(GL_TEXTURE_2D);
-			glDepthMask(GL_FALSE);
+		float x = fcosf(2.f * PI * i / n);
+		float y = fsinf(2.f * PI * i / n);
 
-			glBegin(GL_QUAD_STRIP);
-			{
-				for (i = 0; i <= n; i++)
-				{
-					float x = fcosf(2.f * PI * i / n);
-					float y = fsinf(2.f * PI * i / n);
-			
-					glColor4f(1.0f, 1.0f, 0.0f, 0.5f);
-					glVertex3f(x, 0.0f, y);
-
-					glColor4f(1.0f, 1.0f, 0.0f, 0.0f);
-					glVertex3f(x, GOAL_HEIGHT, y);
-				}
-			}
-			glEnd();
-		}
-		glPopAttrib();
+		goal_list[++S] = FIFO_COMMAND_PACK(FIFO_COLOR, FIFO_VERTEX16, FIFO_VERTEX_XY, FIFO_NOP);
+		goal_list[++S] = RGB15(31, 31, 0);
+		goal_list[++S] = VERTEX_PACK(floattov16(x / SCALE_VERTICES), 0);
+		goal_list[++S] = VERTEX_PACK(floattov16(y / SCALE_VERTICES), 0);
+		goal_list[++S] = VERTEX_PACK(floattov16(x / SCALE_VERTICES), floattov16(GOAL_HEIGHT / SCALE_VERTICES));
 	}
-	glEndList();
-	*/
+
+	goal_list[++S] = FIFO_COMMAND_PACK(FIFO_END, FIFO_POLY_FORMAT, FIFO_NOP, FIFO_NOP);
+	goal_list[++S] = POLY_ALPHA(31) | POLY_CULL_BACK;
+
+	goal_list[0] = S;
 }
 
 void goal_free(void)
 {
-	/*
-	if (glIsList(goal_list))
-		glDeleteLists(goal_list, 1);
+	//if (glIsList(goal_list))
+		//glDeleteLists(goal_list, 1);
 
+	free(goal_list);
 	goal_list = 0;
-	*/
 }
 
 void goal_draw(void)
 {
-	//glCallList(goal_list);
+	glCallList(goal_list);
 	/*
 	glEnable(GL_COLOR_MATERIAL);
 	glDisable(GL_LIGHTING);
@@ -609,6 +595,7 @@ void goal_draw(void)
 	glDepthMask(GL_FALSE);
 	*/
 
+	/*
 	int n = goal_b;
 	glBindTexture(0, 0);
 	glPolyFmt(POLY_ID(61) | POLY_ALPHA(16) | POLY_CULL_BACK);
@@ -632,71 +619,63 @@ void goal_draw(void)
 	glEnd();
 
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
+	*/
 }
 
 /*---------------------------------------------------------------------------*/
 
 static uint32_t* jump_list;
-static int jump_b;
 
 void jump_init(int b)
 {
-	jump_b = b ? 32 : 8;
+	int n = b ? 32 : 8;
 
-	/*
-	jump_list = glGenLists(1);
+	jump_list = (uint32_t*)malloc(sizeof(uint32_t) * 128);
+	jump_list[0] = 0;
+	uint32_t S = jump_list[0];
 
-	glNewList(jump_list, GL_COMPILE);
+	jump_list[++S] = FIFO_COMMAND_PACK(FIFO_TEX_FORMAT, FIFO_PAL_FORMAT, FIFO_POLY_FORMAT, FIFO_BEGIN);
+	jump_list[++S] = 0;
+	jump_list[++S] = 0;
+	jump_list[++S] = POLY_ALPHA(16) | POLY_CULL_BACK;
+	jump_list[++S] = GL_QUAD_STRIP;
+
+	for (int i = 0; i <= n; i++)
 	{
-		glPushAttrib(GL_TEXTURE_BIT  |
-					 GL_LIGHTING_BIT |
-					 GL_DEPTH_BUFFER_BIT);
-		{
-			glEnable(GL_COLOR_MATERIAL);
-			glDisable(GL_LIGHTING);
-			glDisable(GL_TEXTURE_2D);
-			glDepthMask(GL_FALSE);
+		float x = fcosf(2.f * PI * i / n);
+		float y = fsinf(2.f * PI * i / n);
 
-			glBegin(GL_QUAD_STRIP);
-			{
-				for (i = 0; i <= n; i++)
-				{
-					float x = fcosf(2.f * PI * i / n);
-					float y = fsinf(2.f * PI * i / n);
-			
-					glColor4f(1.0f, 1.0f, 1.0f, 0.5f);
-					glVertex3f(x, 0.0f, y);
-
-					glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
-					glVertex3f(x, JUMP_HEIGHT, y);
-				}
-			}
-			glEnd();
-		}
-		glPopAttrib();
+		jump_list[++S] = FIFO_COMMAND_PACK(FIFO_COLOR, FIFO_VERTEX16, FIFO_VERTEX_XY, FIFO_NOP);
+		jump_list[++S] = RGB15(31, 31, 31);
+		jump_list[++S] = VERTEX_PACK(floattov16(x / SCALE_VERTICES), 0);
+		jump_list[++S] = VERTEX_PACK(floattov16(y / SCALE_VERTICES), 0);
+		jump_list[++S] = VERTEX_PACK(floattov16(x / SCALE_VERTICES), floattov16(JUMP_HEIGHT / SCALE_VERTICES));
 	}
-	glEndList();
-	*/
+
+	jump_list[++S] = FIFO_COMMAND_PACK(FIFO_END, FIFO_POLY_FORMAT, FIFO_NOP, FIFO_NOP);
+	jump_list[++S] = POLY_ALPHA(31) | POLY_CULL_BACK;
+
+	jump_list[0] = S;
 }
 
 void jump_free(void)
 {
-	/*
-	if (glIsList(jump_list))
-		glDeleteLists(jump_list, 1);
+	//if (glIsList(jump_list))
+		//glDeleteLists(jump_list, 1);
 
+	free(jump_list);
 	jump_list = 0;
-	*/
 }
 
 void jump_draw(void)
 {
-    //glCallList(jump_list);
+	glCallList(jump_list);
 
 	//glEnable(GL_COLOR_MATERIAL);
 	//glDisable(GL_LIGHTING);
 	//glDisable(GL_TEXTURE_2D);
 	//glDepthMask(GL_FALSE);
+	/*
 	glPolyFmt(POLY_ALPHA(16) | POLY_CULL_BACK);
 
 	int n = jump_b;
@@ -708,7 +687,7 @@ void jump_draw(void)
 		{
 			float x = fcosf(2.f * PI * i / n);
 			float y = fsinf(2.f * PI * i / n);
-	
+
 			//glColor4f(1.0f, 1.0f, 1.0f, 0.5f);
 			glColor3b(255, 255, 255);
 			glVertex3f(x / SCALE_VERTICES, 0, y / SCALE_VERTICES);
@@ -721,87 +700,75 @@ void jump_draw(void)
 	glEnd();
 
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
+	*/
 }
 
 /*---------------------------------------------------------------------------*/
 
 static uint32_t* swch_list_off;
 static uint32_t* swch_list_on;
-static int swch_b;
 
 void swch_init(int b)
 {
-    swch_b = b ? 32 : 8;
-
-	/*
-	swch_list = glGenLists(2);
+    int n = b ? 32 : 8;
 
 	// Create the ON display list.
 
-	glNewList(swch_list, GL_COMPILE);
+	swch_list_on = (uint32_t*)malloc(sizeof(uint32_t) * 128);
+	swch_list_on[0] = 0;
+	uint32_t S = swch_list_on[0];
+
+	swch_list_on[++S] = FIFO_COMMAND_PACK(FIFO_TEX_FORMAT, FIFO_PAL_FORMAT, FIFO_POLY_FORMAT, FIFO_BEGIN);
+	swch_list_on[++S] = 0;
+	swch_list_on[++S] = 0;
+	swch_list_on[++S] = POLY_ID(61) | POLY_ALPHA(16) | POLY_CULL_BACK;
+	swch_list_on[++S] = GL_QUAD_STRIP;
+
+	for (int i = 0; i <= n; i++)
 	{
-		glPushAttrib(GL_TEXTURE_BIT  |
-					 GL_LIGHTING_BIT |
-					 GL_DEPTH_BUFFER_BIT);
-		{
-			glEnable(GL_COLOR_MATERIAL);
-			glDisable(GL_LIGHTING);
-			glDisable(GL_TEXTURE_2D);
-			glDepthMask(GL_FALSE);
+		float x = fcosf(2.f * PI * i / n);
+		float y = fsinf(2.f * PI * i / n);
 
-			glBegin(GL_QUAD_STRIP);
-			{
-				for (i = 0; i <= n; i++)
-				{
-					float x = fcosf(2.f * PI * i / n);
-					float y = fsinf(2.f * PI * i / n);
-			
-					glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
-					glVertex3f(x, 0.0f, y);
-
-					glColor4f(1.0f, 0.0f, 0.0f, 0.0f);
-					glVertex3f(x, SWCH_HEIGHT, y);
-				}
-			}
-			glEnd();
-		}
-		glPopAttrib();
+		swch_list_on[++S] = FIFO_COMMAND_PACK(FIFO_COLOR, FIFO_VERTEX16, FIFO_VERTEX_XY, FIFO_NOP);
+		swch_list_on[++S] = RGB15(0, 31, 0);
+		swch_list_on[++S] = VERTEX_PACK(floattov16(x / SCALE_VERTICES), 0);
+		swch_list_on[++S] = VERTEX_PACK(floattov16(y / SCALE_VERTICES), 0);
+		swch_list_on[++S] = VERTEX_PACK(floattov16(x / SCALE_VERTICES), floattov16(SWCH_HEIGHT / SCALE_VERTICES));
 	}
-	glEndList();
+
+	swch_list_on[++S] = FIFO_COMMAND_PACK(FIFO_END, FIFO_POLY_FORMAT, FIFO_NOP, FIFO_NOP);
+	swch_list_on[++S] = POLY_ALPHA(31) | POLY_CULL_BACK;
+
+	swch_list_on[0] = S;
 
 	// Create the OFF display list.
 
-	glNewList(swch_list + 1, GL_COMPILE);
+	swch_list_off = (uint32_t*)malloc(sizeof(uint32_t) * 128);
+	swch_list_off[0] = 0;
+	S = swch_list_off[0];
+
+	swch_list_off[++S] = FIFO_COMMAND_PACK(FIFO_TEX_FORMAT, FIFO_PAL_FORMAT, FIFO_POLY_FORMAT, FIFO_BEGIN);
+	swch_list_off[++S] = 0;
+	swch_list_off[++S] = 0;
+	swch_list_off[++S] = POLY_ALPHA(16) | POLY_CULL_BACK;
+	swch_list_off[++S] = GL_QUAD_STRIP;
+
+	for (int i = 0; i <= n; i++)
 	{
-		glPushAttrib(GL_TEXTURE_BIT  |
-					 GL_LIGHTING_BIT |
-					 GL_DEPTH_BUFFER_BIT);
-		{
-			glEnable(GL_COLOR_MATERIAL);
-			glDisable(GL_LIGHTING);
-			glDisable(GL_TEXTURE_2D);
-			glDepthMask(GL_FALSE);
+		float x = fcosf(2.f * PI * i / n);
+		float y = fsinf(2.f * PI * i / n);
 
-			glBegin(GL_QUAD_STRIP);
-			{
-				for (i = 0; i <= n; i++)
-				{
-					float x = fcosf(2.f * PI * i / n);
-					float y = fsinf(2.f * PI * i / n);
-			
-					glColor4f(0.0f, 1.0f, 0.0f, 0.5f);
-					glVertex3f(x, 0.0f, y);
-
-					glColor4f(0.0f, 1.0f, 0.0f, 0.0f);
-					glVertex3f(x, SWCH_HEIGHT, y);
-				}
-			}
-			glEnd();
-		}
-		glPopAttrib();
+		swch_list_off[++S] = FIFO_COMMAND_PACK(FIFO_COLOR, FIFO_VERTEX16, FIFO_VERTEX_XY, FIFO_NOP);
+		swch_list_off[++S] = RGB15(31, 0, 0);
+		swch_list_off[++S] = VERTEX_PACK(floattov16(x / SCALE_VERTICES), 0);
+		swch_list_off[++S] = VERTEX_PACK(floattov16(y / SCALE_VERTICES), 0);
+		swch_list_off[++S] = VERTEX_PACK(floattov16(x / SCALE_VERTICES), floattov16(SWCH_HEIGHT / SCALE_VERTICES));
 	}
-	glEndList();
-	*/
+
+	swch_list_off[++S] = FIFO_COMMAND_PACK(FIFO_END, FIFO_POLY_FORMAT, FIFO_NOP, FIFO_NOP);
+	swch_list_off[++S] = POLY_ALPHA(31) | POLY_CULL_BACK;
+
+	swch_list_off[0] = S;
 }
 
 void swch_free(void)
@@ -812,118 +779,71 @@ void swch_free(void)
 
 	swch_list = 0;
 	*/
+	free(swch_list_off);
+	free(swch_list_on);
+	swch_list_off = 0;
+	swch_list_on = 0;
 }
 
 void swch_draw(int b)
 {
-	//glEnable(GL_COLOR_MATERIAL);
-	//glDisable(GL_LIGHTING);
-	//glDisable(GL_TEXTURE_2D);
-	//glDepthMask(GL_FALSE);
-	int n = swch_b;
-	glBindTexture(0, 0);
-	glPolyFmt(POLY_ALPHA(16) | POLY_CULL_BACK);
-
-    if (b)
+	if (b)
 	{
 		// ON
-        //glCallList(swch_list + 1);
-		glBegin(GL_QUAD_STRIP);
-		{
-			for (int i = 0; i <= n; i++)
-			{
-				float x = fcosf(2.f * PI * i / n);
-				float y = fsinf(2.f * PI * i / n);
-		
-				//glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
-				glColor3b(0, 255, 0);
-				glVertex3f(x / SCALE_VERTICES, 0, y / SCALE_VERTICES);
-
-				//glColor4f(1.0f, 0.0f, 0.0f, 0.0f);
-				glColor3b(0, 255, 0);
-				glVertex3f(x / SCALE_VERTICES, SWCH_HEIGHT / SCALE_VERTICES, y / SCALE_VERTICES);
-			}
-		}
-		glEnd();
+        glCallList(swch_list_on);
 	}
     else
 	{
 		// OFF
-        //glCallList(swch_list);
-		glBegin(GL_QUAD_STRIP);
-		{
-			for (int i = 0; i <= n; i++)
-			{
-				float x = fcosf(2.f * PI * i / n);
-				float y = fsinf(2.f * PI * i / n);
-		
-				//glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
-				glColor3b(255, 0, 0);
-				glVertex3f(x / SCALE_VERTICES, 0, y / SCALE_VERTICES);
-
-				//glColor4f(1.0f, 0.0f, 0.0f, 0.0f);
-				glColor3b(255, 0, 0);
-				glVertex3f(x / SCALE_VERTICES, SWCH_HEIGHT / SCALE_VERTICES, y / SCALE_VERTICES);
-			}
-		}
-		glEnd();
+        glCallList(swch_list_off);
 	}
-
-	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
 }
 
 /*---------------------------------------------------------------------------*/
 
 static uint32_t* flag_list;
-static int flag_b;
 
 void flag_init(int b)
 {
-	flag_b = b ? 8 : 4;
+	int n = b ? 8 : 4;
 
-	/*
-	flag_list = glGenLists(1);
+	flag_list = (uint32_t*)malloc(sizeof(uint32_t) * 128);
+	flag_list[0] = 0;
+	uint32_t S = flag_list[0];
 
-	glNewList(flag_list, GL_COMPILE);
+	flag_list[++S] = FIFO_COMMAND_PACK(FIFO_TEX_FORMAT, FIFO_PAL_FORMAT, FIFO_BEGIN, FIFO_NOP);
+	flag_list[++S] = 0;
+	flag_list[++S] = 0;
+	flag_list[++S] = GL_QUAD_STRIP;
+
+	for (int i = 0; i <= n; i++)
 	{
-		glPushAttrib(GL_TEXTURE_BIT | GL_LIGHTING_BIT);
-		{
-			glEnable(GL_COLOR_MATERIAL);
-			glDisable(GL_LIGHTING);
-			glDisable(GL_TEXTURE_2D);
+		float x = fcosf(2.f * PI * i / n) * 0.01f;
+		float y = fsinf(2.f * PI * i / n) * 0.01f;
 
-			glBegin(GL_QUAD_STRIP);
-			{
-				for (i = 0; i <= n; i++)
-				{
-					float x = fcosf(2.f * PI * i / n) * 0.01f;
-					float y = fsinf(2.f * PI * i / n) * 0.01f;
-			
-					glColor3f(1.0f, 1.0f, 1.0f);
-					glVertex3f(x, 0.0f,        y);
-					glVertex3f(x, GOAL_HEIGHT, y);
-				}
-			}
-			glEnd();
-
-			glBegin(GL_TRIANGLES);
-			{
-				glColor3f(1.0f, 0.0f, 0.0f);
-
-				glVertex3f(              0.0f, GOAL_HEIGHT,        0.0f);
-				glVertex3f(GOAL_HEIGHT * 0.2f, GOAL_HEIGHT * 0.9f, 0.0f);
-				glVertex3f(              0.0f, GOAL_HEIGHT * 0.8f, 0.0f);
-
-				glVertex3f(              0.0f, GOAL_HEIGHT,        0.0f);
-				glVertex3f(              0.0f, GOAL_HEIGHT * 0.8f, 0.0f);
-				glVertex3f(GOAL_HEIGHT * 0.2f, GOAL_HEIGHT * 0.9f, 0.0f);
-			}
-			glEnd();
-		}
-		glPopAttrib();
+		flag_list[++S] = FIFO_COMMAND_PACK(FIFO_COLOR, FIFO_VERTEX16, FIFO_VERTEX_XY, FIFO_NOP);
+		flag_list[++S] = RGB15(31, 31, 31);
+		flag_list[++S] = VERTEX_PACK(floattov16(x / SCALE_VERTICES), 0);
+		flag_list[++S] = VERTEX_PACK(floattov16(y / SCALE_VERTICES), 0);
+		flag_list[++S] = VERTEX_PACK(floattov16(x / SCALE_VERTICES), floattov16(GOAL_HEIGHT / SCALE_VERTICES));
 	}
-	glEndList();
-	*/
+
+	flag_list[++S] = FIFO_COMMAND_PACK(FIFO_END, FIFO_BEGIN, FIFO_COLOR, FIFO_NOP);
+	flag_list[++S] = GL_TRIANGLES;
+	flag_list[++S] = RGB15(31, 0, 0);
+
+	flag_list[++S] = FIFO_COMMAND_PACK(FIFO_VERTEX16, FIFO_VERTEX_XY, FIFO_VERTEX_XY, FIFO_NOP);
+	flag_list[++S] = VERTEX_PACK(0,                                               floattov16(GOAL_HEIGHT / SCALE_VERTICES));
+	flag_list[++S] = VERTEX_PACK(0,                                               0);
+	flag_list[++S] = VERTEX_PACK(floattov16(GOAL_HEIGHT * 0.2f / SCALE_VERTICES), floattov16(GOAL_HEIGHT * 0.9f / SCALE_VERTICES));
+	flag_list[++S] = VERTEX_PACK(0,                                               floattov16(GOAL_HEIGHT * 0.8f / SCALE_VERTICES));
+
+	flag_list[++S] = FIFO_COMMAND_PACK(FIFO_VERTEX_XY, FIFO_VERTEX_XY, FIFO_VERTEX_XY, FIFO_END);
+	flag_list[++S] = VERTEX_PACK(0,                                               floattov16(GOAL_HEIGHT / SCALE_VERTICES));
+	flag_list[++S] = VERTEX_PACK(0,                                               floattov16(GOAL_HEIGHT * 0.8f / SCALE_VERTICES));
+	flag_list[++S] = VERTEX_PACK(floattov16(GOAL_HEIGHT * 0.2f / SCALE_VERTICES), floattov16(GOAL_HEIGHT * 0.9f / SCALE_VERTICES));
+
+	flag_list[0] = S;
 }
 
 void flag_free(void)
@@ -932,50 +852,14 @@ void flag_free(void)
 	if (glIsList(flag_list))
 		glDeleteLists(flag_list, 1);
 
-	flag_list = 0;
 	*/
+	free(flag_list);
+	flag_list = 0;
 }
 
 void flag_draw(void)
 {
-    //glCallList(flag_list);
-
-	/*
-	glEnable(GL_COLOR_MATERIAL);
-	glDisable(GL_LIGHTING);
-	glDisable(GL_TEXTURE_2D);
-	*/
-	int n = flag_b;
-	glBindTexture(0, 0);
-	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
-
-	glBegin(GL_QUAD_STRIP);
-	{
-		for (int i = 0; i <= n; i++)
-		{
-			float x = fcosf(2.f * PI * i / n) * 0.01f;
-			float y = fsinf(2.f * PI * i / n) * 0.01f;
-	
-			glColor3b(255, 255, 255);
-			glVertex3f(x / SCALE_VERTICES, 0.0f,        y / SCALE_VERTICES);
-			glVertex3f(x / SCALE_VERTICES, GOAL_HEIGHT, y / SCALE_VERTICES);
-		}
-	}
-	glEnd();
-
-	glBegin(GL_TRIANGLES);
-	{
-		glColor3b(255, 0, 0);
-
-		glVertex3f(              0.0f,                  GOAL_HEIGHT / SCALE_VERTICES,        0.0f);
-		glVertex3f(GOAL_HEIGHT * 0.2f / SCALE_VERTICES, GOAL_HEIGHT * 0.9f / SCALE_VERTICES, 0.0f);
-		glVertex3f(              0.0f,                  GOAL_HEIGHT * 0.8f / SCALE_VERTICES, 0.0f);
-
-		glVertex3f(              0.0f,                  GOAL_HEIGHT / SCALE_VERTICES,        0.0f);
-		glVertex3f(              0.0f,                  GOAL_HEIGHT * 0.8f / SCALE_VERTICES, 0.0f);
-		glVertex3f(GOAL_HEIGHT * 0.2f / SCALE_VERTICES, GOAL_HEIGHT * 0.9f / SCALE_VERTICES, 0.0f);
-	}
-	glEnd();
+    glCallList(flag_list);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -1022,8 +906,8 @@ void shad_draw_set(const float *p, float r)
         glBindTexture(GL_TEXTURE_2D, shad_text);
 
         glLoadIdentity();
-        glTranslatef(0.5f - k * p[0],
-                     0.5f - k * p[2], 0.f);
+        glTranslatef((0.5f - k * p[0]) / SCALE_VERTICES,
+                     (0.5f - k * p[2]) / SCALE_VERTICES, 0.f);
         glScalef(k, k, 1.0f);
     }
     glMatrixMode(GL_MODELVIEW);
