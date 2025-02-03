@@ -2,7 +2,7 @@
 
 Port of Neverball 1.4.0 to the Nintendo DS
 
-[!image](screenshot.png)
+![image](screenshot.png)
 
 Made with BlocksDS.
 
