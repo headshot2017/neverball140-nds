@@ -277,11 +277,8 @@ int ball_main(int argc, char *argv[])
 			{
 				//SDL_Joystick *joy = NULL;
 
-				printf("config init\n");
 				config_init();
-				printf("config load\n");
 				config_load();
-				printf("config done\n");
 
 				/* Initialize the joystick. */
 
@@ -314,9 +311,7 @@ int ball_main(int argc, char *argv[])
 				audio_bind(AUD_TIME,   1, "snd/time.wav");
 				audio_bind(AUD_OVER,   1, "snd/over.wav");
 
-				printf("audio init\n");
 				audio_init();
-				printf("audio done\n");
 
 				timer_init();
 
@@ -326,7 +321,6 @@ int ball_main(int argc, char *argv[])
 								256,
 								192))
 				{
-					printf("video inited\n");
 					int t1, t0 = timer_get();
 
 					/* Initialize the run state and the title display. */
