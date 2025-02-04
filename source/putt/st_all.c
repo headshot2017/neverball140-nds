@@ -742,7 +742,7 @@ static void stroke_stick(int id, int a, int k)
     }
     if (config_tst_d(CONFIG_JOYSTICK_AXIS_Y, a))
     {
-        stroke_mag = (k == 1) ? 0 : (k > 0) ? -1024 : 1024;
+        stroke_mag = (k == 1) ? 0 : (k > 0) ? 1024 : -1024;
         stroke_magspd = (stroke_mag) ? 1 : 0;
     }
 }
