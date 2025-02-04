@@ -729,8 +729,11 @@ static void stroke_timer(int id, float dt)
 
 static void stroke_point(int id, int x, int y, int dx, int dy)
 {
-    putt_game_set_rot(dx);
-    putt_game_set_mag(dy);
+	if (abs(dx) > 8) dx *= 4;
+	if (abs(dy) > 8) dy *= 4;
+
+    putt_game_set_rot(dx*4);
+    putt_game_set_mag(dy*4);
 }
 
 static void stroke_stick(int id, int a, int k)

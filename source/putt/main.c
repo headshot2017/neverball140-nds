@@ -122,8 +122,14 @@ static int loop(void)
 			st_stick(config_get_d(CONFIG_JOYSTICK_AXIS_Y), +JOY_MAX);
 		if (held & KEY_TOUCH || down & KEY_TOUCH)
 		{
+			static touchPosition lastTouch = {0};
 			touchRead(&touch);
-			st_point(touch.px, -touch.py + config_get_d(CONFIG_HEIGHT), 0, 0);
+			if (down & KEY_TOUCH)
+				lastTouch = touch;
+
+			st_point(touch.px, -touch.py + config_get_d(CONFIG_HEIGHT), touch.px - lastTouch.px, -touch.py + lastTouch.py);
+			lastTouch = touch;
+
 			if (down & KEY_TOUCH)
 				d = st_click(-1, 1);
 		}
