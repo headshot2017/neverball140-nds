@@ -107,7 +107,7 @@ int  mf_inv(int *I, const int *M)
              mulf32(M[C], (mulf32(M[1], M[6]) - mulf32(M[2], M[5])) ));
 
     T[C] = -(mulf32(M[1], (mulf32(M[6], M[B]) - mulf32(M[7], M[A])) ) -
-             mulf32(M[5], (mulf32(M[2]. M[B]) - mulf32(M[3], M[A])) ) +
+             mulf32(M[5], (mulf32(M[2], M[B]) - mulf32(M[3], M[A])) ) +
              mulf32(M[9], (mulf32(M[2], M[7]) - mulf32(M[3], M[6])) ));
     T[D] = +(mulf32(M[0], (mulf32(M[6], M[B]) - mulf32(M[7], M[A])) ) -
              mulf32(M[4], (mulf32(M[2], M[B]) - mulf32(M[3], M[A])) ) +
