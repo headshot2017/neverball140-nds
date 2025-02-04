@@ -171,7 +171,7 @@ static void adx_frames(DSTIME endtime, u8 firstFrames)
 {
 	while (paintedtime < endtime)
 	{
-		if (adx->flag == 1)
+		if (firstFrames && adx->flag == 1)
 			break;
 
 		adx_frame();
@@ -183,6 +183,8 @@ static void adx_frames(DSTIME endtime, u8 firstFrames)
 		{
 			adx_readPtr -= ADX_FILE_BUFFER_SIZE;
 			memcpy((void *)adx_readPtr, (void *)(adx_readPtr + ADX_FILE_BUFFER_SIZE), ADX_FILE_BUFFER_SIZE - (adx_readPtr-adx->buffer));
+			if (adx->flag == 1)
+				break;
 			adx->flag = 1;
 		}
 	}
