@@ -5,8 +5,9 @@
 BLOCKSDS	?= /opt/blocksds/core
 
 DEFINES		:= -DARM9
-SOURCEDIRS	:= share ball
-INCLUDEDIRS	:= share common
+SOURCEDIRS	:= source/main source/share source/ball source/putt
+INCLUDEDIRS	:= source source/share common
+GFXDIRS     := graphics
 
 LIBS		:= -lnds9 -ldswifi9 -lxm79
 LIBDIRS		:= $(BLOCKSDS)/libs/libnds \

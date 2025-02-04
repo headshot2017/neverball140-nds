@@ -98,7 +98,7 @@ void course_free(void)
 void course_rand(void)
 {
     course_goto(rand() % count);
-    hole_goto(rand() % curr_count(), 4);
+    hole_goto(rand() % putt_curr_count(), 4);
 }
 
 /*---------------------------------------------------------------------------*/

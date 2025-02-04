@@ -12,13 +12,13 @@
  * General Public License for more details.
  */
 
-#include <SDL.h>
 #include <math.h>
 
 #include "gui.h"
 #include "hud.h"
 #include "hole.h"
 #include "config.h"
+#include "timer.h"
 
 /*---------------------------------------------------------------------------*/
 
@@ -28,7 +28,7 @@ static int fps_id;
 
 /*---------------------------------------------------------------------------*/
 
-void hud_init(void)
+void putt_hud_init(void)
 {
     static const float *color[5] = {
         gui_wht,
@@ -55,7 +55,7 @@ void hud_init(void)
         gui_layout(fps_id, -1, +1);
 }
 
-void hud_free(void)
+void putt_hud_free(void)
 {
     gui_delete(Lhud_id);
     gui_delete(Rhud_id);
@@ -64,13 +64,13 @@ void hud_free(void)
 
 /*---------------------------------------------------------------------------*/
 
-void hud_paint(void)
+void putt_hud_paint(void)
 {
     static int fps   = 0;
     static int then  = 0;
     static int count = 0;
 
-    int now = SDL_GetTicks();
+    int now = timer_get();
 
     if (now - then > 250)
     {

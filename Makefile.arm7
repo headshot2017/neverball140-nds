@@ -5,7 +5,7 @@
 BLOCKSDS	?= /opt/blocksds/core
 
 DEFINES		:= -DARM7
-SOURCEDIRS	:= arm7/source
+SOURCEDIRS	:= source/arm7
 INCLUDEDIRS	:= common
 
 LIBS		:= -lnds7 -ldswifi7 -lxm77

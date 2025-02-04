@@ -28,7 +28,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <nds.h>
-#include <fat.h>
 
 #include "glext.h"
 #include "config.h"
@@ -39,11 +38,12 @@
 #include "gui.h"
 #include "set.h"
 #include "timer.h"
+#include "libadx.h"
 
 #include "st_conf.h"
 #include "st_title.h"
 
-#include "libadx.h"
+#include "main.h"
 
 #define TITLE "Neverball"
 
@@ -63,9 +63,9 @@ static void shot(void)
 
 static void toggle_wire(void)
 {
+	/*
     static int wire = 0;
 
-	/*
     if (wire)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -248,34 +248,23 @@ static int loop(void)
 	*/
 }
 
-int main(int argc, char *argv[])
+int ball_main(int argc, char *argv[])
 {
-	defaultExceptionHandler();
+	vramSetPrimaryBanks(VRAM_A_LCD, VRAM_B_LCD, VRAM_C_LCD, VRAM_D_LCD);
+	dmaFillHalfWords(0, VRAM_A, 131072);
+	dmaFillHalfWords(0, VRAM_B, 131072);
+	dmaFillHalfWords(0, VRAM_C, 131072);
+	dmaFillHalfWords(0, VRAM_D, 131072);
+	vramSetPrimaryBanks(VRAM_A_TEXTURE, VRAM_B_TEXTURE, VRAM_C_TEXTURE, VRAM_D_TEXTURE);
 
-	videoSetMode(MODE_0_3D);
-	videoSetModeSub(MODE_0_2D);
-
-	lcdMainOnBottom();
-
-	vramSetBankA(VRAM_A_TEXTURE);
-	vramSetBankB(VRAM_B_TEXTURE);
-	vramSetBankC(VRAM_C_TEXTURE);
-	vramSetBankD(VRAM_D_TEXTURE);
 	vramSetBankE(VRAM_E_TEX_PALETTE);
 	vramSetBankF(VRAM_F_TEX_PALETTE);
 	vramSetBankG(VRAM_G_TEX_PALETTE);
 	vramSetBankH(VRAM_H_SUB_BG);
 
-	consoleInit(NULL, 0, BgType_Text4bpp, BgSize_T_256x256, 14, 0, false, true);
+	consoleInit(NULL, 1, BgType_Text4bpp, BgSize_T_256x256, 14, 0, false, true);
 	consoleDebugInit(DebugDevice_NOCASH);
 
-	if (!fatInitDefault())
-	{
-		printf("fatInitDefault() failed!\ncan't continue loading");
-		while (1) swiWaitForVBlank();
-	}
-
-	glInit();
 
     if (config_data_path((argc > 1 ? argv[1] : NULL), SET_FILE))
     {
@@ -345,8 +334,9 @@ int main(int argc, char *argv[])
                     /* Run the main game loop. */
 
                     while (loop())
-                        if ((t1 = timer_get()) > t0)
+                        //if ((t1 = timer_get()) > t0)
                         {
+                            t1 = timer_get();
                             if (config_get_pause())
                             {
                                 st_paint();
@@ -368,7 +358,9 @@ int main(int argc, char *argv[])
                 }
                 //else fprintf(stderr, "%s: %s\n", argv[0], SDL_GetError());
 
+                audio_free();
                 config_save();
+                timer_free();
 
                 //if (SDL_JoystickOpened(0))
                     //SDL_JoystickClose(joy);
@@ -380,6 +372,16 @@ int main(int argc, char *argv[])
         else fprintf(stderr, "Failure to establish config directory\n");
     }
     else fprintf(stderr, "Failure to establish game data directory\n");
+
+	consoleClear();
+	consoleSelect(NULL);
+	vramSetPrimaryBanks(VRAM_A_LCD, VRAM_B_LCD, VRAM_C_LCD, VRAM_D_LCD);
+	vramSetBankH(VRAM_H_LCD);
+	dmaFillHalfWords(0, VRAM_A, 131072);
+	dmaFillHalfWords(0, VRAM_B, 131072);
+	dmaFillHalfWords(0, VRAM_C, 131072);
+	dmaFillHalfWords(0, VRAM_D, 131072);
+	dmaFillHalfWords(0, VRAM_H, 32768);
 
     return 0;
 }

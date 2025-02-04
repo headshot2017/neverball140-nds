@@ -1,5 +1,5 @@
-#ifndef HOLE_H
-#define HOLE_H
+#ifndef PUTT_HOLE_H
+#define PUTT_HOLE_H
 
 /*---------------------------------------------------------------------------*/
 
@@ -20,7 +20,7 @@ int  curr_hole(void);
 int  curr_party(void);
 int  curr_player(void);
 int  curr_stroke(void);
-int  curr_count(void);
+int  putt_curr_count(void);
 
 const char *curr_scr(void);
 const char *curr_par(void);

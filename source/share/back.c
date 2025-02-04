@@ -102,7 +102,7 @@ void back_init(const char *s, int b)
 		back_list[++S] = FIFO_COMMAND_PACK(FIFO_END, FIFO_NOP, FIFO_NOP, FIFO_NOP);
 	}
 	back_list[0] = S;
-	printf("back: %d %d %s\n", S, (stacks*3)*(slices*10), s);
+	printf("back: %d %d %s\n", S, 2048, s);
 }
 
 void back_free(void)

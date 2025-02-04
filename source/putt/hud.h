@@ -1,12 +1,12 @@
-#ifndef HUD_H
-#define HUD_H
+#ifndef PUTT_HUD_H
+#define PUTT_HUD_H
 
 /*---------------------------------------------------------------------------*/
 
-void hud_init(void);
-void hud_free(void);
+void putt_hud_init(void);
+void putt_hud_free(void);
 
-void hud_paint(void);
+void putt_hud_paint(void);
 
 /*---------------------------------------------------------------------------*/
 

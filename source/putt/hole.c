@@ -91,7 +91,7 @@ void hole_init(const char *filename)
 
 void hole_free(void)
 {
-    game_free();
+    putt_game_free();
     back_free();
 
     count = 0;
@@ -185,7 +185,7 @@ char *hole_in(int p)
 int curr_hole(void)   { return hole;   }
 int curr_party(void)  { return party;  }
 int curr_player(void) { return player; }
-int curr_count(void)  { return count;  }
+int putt_curr_count(void)  { return count;  }
 
 const char *curr_scr(void)
 {
@@ -219,15 +219,15 @@ void hole_goto(int h, int p)
         player = (hole - 1) % party + 1;
         done   = 0;
 
-        back_init(hole_v[hole].back, 1);
-        game_init(hole_v[hole].file);
+        back_init(hole_v[hole].back, config_get_d(CONFIG_GEOMETRY));
+        putt_game_init(hole_v[hole].file);
 
         for (i = 1; i <= party; i++)
         {
-            game_get_pos(ball_p[i], ball_e[i]);
+            putt_game_get_pos(ball_p[i], ball_e[i]);
             stat_v[i] = 0;
         }
-        game_ball(player);
+        putt_game_ball(player);
         hole_song();
     }
 }
@@ -242,8 +242,8 @@ int hole_next(void)
         }
         while (stat_v[player]);
 
-        game_ball(player);
-        game_get_pos(ball_p[player], ball_e[player]);
+        putt_game_ball(player);
+        putt_game_get_pos(ball_p[player], ball_e[player]);
 
         return 1;
     }
@@ -256,7 +256,7 @@ int hole_move(void)
     {
         hole++;
 
-        game_free();
+        putt_game_free();
         back_free();
 
         hole_goto(hole, party);
@@ -313,7 +313,7 @@ void hole_fall(void)
 
     /* Reset to the position of the putt, and apply a one-stroke penalty. */
 
-    game_set_pos(ball_p[player], ball_e[player]);
+    putt_game_set_pos(ball_p[player], ball_e[player]);
     score_v[hole][player] += 2;
 
     /* Cap scores at 12. */

@@ -1,5 +1,5 @@
-#ifndef GAME_H
-#define GAME_H
+#ifndef PUTT_GAME_H
+#define PUTT_GAME_H
 
 /*---------------------------------------------------------------------------*/
 
@@ -35,23 +35,23 @@
 
 /*---------------------------------------------------------------------------*/
 
-void  game_init(const char *);
-void  game_free(void);
+void  putt_game_init(const char *);
+void  putt_game_free(void);
 
-void  game_draw(int);
-void  game_putt(void);
-int   game_step(const float[3], float);
+void  putt_game_draw(int);
+void  putt_game_putt(void);
+int   putt_game_step(const float[3], float);
 
-void  game_update_view(float);
+void  putt_game_update_view(float);
 
-void  game_set_rot(int);
-void  game_clr_mag(void);
-void  game_set_mag(int);
-void  game_set_fly(float);
+void  putt_game_set_rot(int);
+void  putt_game_clr_mag(void);
+void  putt_game_set_mag(int);
+void  putt_game_set_fly(float);
 
-void  game_ball(int);
-void  game_set_pos(float[3], float[3][3]);
-void  game_get_pos(float[3], float[3][3]);
+void  putt_game_ball(int);
+void  putt_game_set_pos(float[3], float[3][3]);
+void  putt_game_get_pos(float[3], float[3][3]);
 
 /*---------------------------------------------------------------------------*/
 

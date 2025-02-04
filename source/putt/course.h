@@ -1,5 +1,5 @@
-#ifndef COURSE_H
-#define COURSE_H
+#ifndef PUTT_COURSE_H
+#define PUTT_COURSE_H
 
 /*---------------------------------------------------------------------------*/
 

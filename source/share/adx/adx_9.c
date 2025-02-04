@@ -17,7 +17,7 @@ static FILE* adx_in;
 static u8* adx_buffer;
 static u16* adx_audioLeft;
 static u16* adx_audioRight;
-volatile adx_player* adx;
+volatile adx_player* adx = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -89,6 +89,8 @@ static void *uncached_malloc(size_t count)
 
 int adx_init()
 {
+	if (adx) return 1;
+
 	adx_in = 0;
 	adx = (adx_player*)uncached_malloc(sizeof(adx_player));
 	adx_buffer = (u8*)uncached_malloc(ADX_FILE_BUFFER_SIZE*2);

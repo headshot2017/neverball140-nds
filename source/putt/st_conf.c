@@ -41,12 +41,16 @@
 #define CONF_SHDOF 17
 #define CONF_AUDHI 18
 #define CONF_AUDLO 19
-#define CONF_BACK  20
+#define CONF_MUSDC 20
+#define CONF_MUSPC 21
+#define CONF_BACK  22
 
 static int audlo_id;
 static int audhi_id;
 static int music_id[11];
 static int sound_id[11];
+static int pcmus_id;
+static int dcmus_id;
 
 static int conf_action(int i)
 {
@@ -62,81 +66,81 @@ static int conf_action(int i)
     switch (i)
     {
     case CONF_FULL:
-        goto_state(&st_null);
+        goto_state(&st_putt_null);
         r = config_mode(1, w, h);
-        goto_state(&st_conf);
+        goto_state(&st_putt_conf);
         break;
 
     case CONF_WIN:
-        goto_state(&st_null);
+        goto_state(&st_putt_null);
         r = config_mode(0, w, h);
-        goto_state(&st_conf);
+        goto_state(&st_putt_conf);
         break;
         
     case CONF_16x12:
-        goto_state(&st_null);
+        goto_state(&st_putt_null);
         r = config_mode(f, 1600, 1200);
-        goto_state(&st_conf);
+        goto_state(&st_putt_conf);
         break;
 
     case CONF_12x10:
-        goto_state(&st_null);
+        goto_state(&st_putt_null);
         r = config_mode(f, 1280, 1024);
-        goto_state(&st_conf);
+        goto_state(&st_putt_conf);
         break;
 
     case CONF_10x7:
-        goto_state(&st_null);
+        goto_state(&st_putt_null);
         r = config_mode(f, 1024, 768);
-        goto_state(&st_conf);
+        goto_state(&st_putt_conf);
         break;
             
     case CONF_8x6:
-        goto_state(&st_null);
+        goto_state(&st_putt_null);
         r = config_mode(f, 800, 600);
-        goto_state(&st_conf);
+        goto_state(&st_putt_conf);
         break;
 
     case CONF_6x4:
-        goto_state(&st_null);
+        goto_state(&st_putt_null);
         r = config_mode(f, 640, 480);
-        goto_state(&st_conf);
+        goto_state(&st_putt_conf);
         break;
 
     case CONF_TEXHI:
-        goto_state(&st_null);
+        goto_state(&st_putt_null);
         config_set_d(CONFIG_TEXTURES, 1);
-        goto_state(&st_conf);
+        goto_state(&st_putt_conf);
         break;
 
     case CONF_TEXLO:
-        goto_state(&st_null);
+        goto_state(&st_putt_null);
         config_set_d(CONFIG_TEXTURES, 2);
-        goto_state(&st_conf);
+        goto_state(&st_putt_conf);
         break;
 
     case CONF_GEOHI:
-        goto_state(&st_null);
+        goto_state(&st_putt_null);
         config_set_d(CONFIG_GEOMETRY, 1);
-        goto_state(&st_conf);
+        goto_state(&st_putt_conf);
         break;
 
     case CONF_GEOLO:
-        goto_state(&st_null);
+        goto_state(&st_putt_null);
         config_set_d(CONFIG_GEOMETRY, 0);
-        goto_state(&st_conf);
+        goto_state(&st_putt_conf);
         break;
 
     case CONF_SHDON:
-        goto_state(&st_null);
+        goto_state(&st_putt_null);
         config_set_d(CONFIG_SHADOW, 1);
-        goto_state(&st_conf);
+        goto_state(&st_putt_conf);
         break;
 
     case CONF_SHDOF:
-        goto_state(&st_null);
+        goto_state(&st_putt_null);
         config_set_d(CONFIG_SHADOW, 0);
-        goto_state(&st_conf);
+        goto_state(&st_putt_conf);
         break;
 
     case CONF_AUDHI:
@@ -157,8 +161,26 @@ static int conf_action(int i)
         audio_init();
         break;
 
+    case CONF_MUSPC:
+        audio_free();
+        config_set_d(CONFIG_SOUNDTRACK, 0);
+        audio_init();
+        audio_music_fade_to(0.5f, "bgm/inter.ogg");
+        gui_toggle(pcmus_id);
+        gui_toggle(dcmus_id);
+        break;
+
+    case CONF_MUSDC:
+        audio_free();
+        config_set_d(CONFIG_SOUNDTRACK, 1);
+        audio_init();
+        audio_music_fade_to(0.5f, "bgm/inter.ogg");
+        gui_toggle(pcmus_id);
+        gui_toggle(dcmus_id);
+        break;
+
     case CONF_BACK:
-        goto_state(&st_title);
+        goto_state(&st_putt_title);
         break;
 
     default:
@@ -201,22 +223,25 @@ static int conf_enter(void)
     {
         if ((jd = gui_varray(id)))
         {
-            int w = config_get_d(CONFIG_WIDTH);
+            //int w = config_get_d(CONFIG_WIDTH);
             int t = config_get_d(CONFIG_TEXTURES);
             int g = config_get_d(CONFIG_GEOMETRY);
             int h = config_get_d(CONFIG_SHADOW);
             int a = config_get_d(CONFIG_AUDIO_RATE);
             int s = config_get_d(CONFIG_SOUND_VOLUME);
             int m = config_get_d(CONFIG_MUSIC_VOLUME);
+            int pc = !config_get_d(CONFIG_SOUNDTRACK);
 
             if ((kd = gui_harray(jd)))
             {
                 gui_label(kd, "Options", GUI_SML, GUI_ALL, 0, 0);
-                gui_filler(kd);
+                gui_start(kd, "Back", GUI_SML, CONF_BACK, 0);
+                //gui_filler(kd);
             }
 
             /* Add mode selectors only for existing modes. */
 
+            /*
             if (SDL_VideoModeOK(1600, 1200, 16, SDL_HWSURFACE))
                 gui_state(jd, "1600 x 1200", GUI_SML, CONF_16x12, (w == 1600));
             if (SDL_VideoModeOK(1280, 1024, 16, SDL_HWSURFACE))
@@ -227,6 +252,7 @@ static int conf_enter(void)
                 gui_state(jd, "800 x 600",   GUI_SML, CONF_8x6,   (w ==  800));
             if (SDL_VideoModeOK(640, 480, 16, SDL_HWSURFACE))
                 gui_state(jd, "640 x 480",   GUI_SML, CONF_6x4,   (w ==  640));
+            */
 
             if ((kd = gui_harray(jd)))
             {
@@ -250,6 +276,11 @@ static int conf_enter(void)
 
                 audlo_id = gui_state(kd, "Low",  GUI_SML, CONF_AUDLO, lo);
                 audhi_id = gui_state(kd, "High", GUI_SML, CONF_AUDHI, hi);
+            }
+            if ((kd = gui_harray(jd)))
+            {
+                dcmus_id = gui_state(kd, "Dreamcast", GUI_SML, CONF_MUSDC, (pc == 0));
+                pcmus_id = gui_state(kd, "Original",  GUI_SML, CONF_MUSPC, (pc == 1));
             }
             if ((kd = gui_harray(jd)))
             {
@@ -286,8 +317,9 @@ static int conf_enter(void)
         }
         if ((jd = gui_vstack(id)))
         {
-            int f = config_get_d(CONFIG_FULLSCREEN);
+            //int f = config_get_d(CONFIG_FULLSCREEN);
 
+            /*
             if ((kd = gui_harray(jd)))
             {
                 gui_filler(kd);
@@ -296,6 +328,7 @@ static int conf_enter(void)
 
             gui_state(jd, "Fullscreen",   GUI_SML, CONF_FULL, (f == 1));
             gui_state(jd, "Window",       GUI_SML, CONF_WIN,  (f == 0));
+            */
 
             /* This filler expands to accomodate an unknown number of modes. */
             gui_filler(jd);
@@ -304,6 +337,7 @@ static int conf_enter(void)
             gui_label(jd, "Geometry",     GUI_SML, GUI_ALL, 0, 0);
             gui_label(jd, "Shadow",       GUI_SML, GUI_ALL, 0, 0);
             gui_label(jd, "Audio",        GUI_SML, GUI_ALL, 0, 0);
+            gui_label(jd, "Soundtrack",   GUI_SML, GUI_ALL, 0, 0);
             gui_label(jd, "Sound Volume", GUI_SML, GUI_ALL, 0, 0);
             gui_label(jd, "Music Volume", GUI_SML, GUI_ALL, 0, 0);
         }
@@ -358,7 +392,7 @@ static int conf_click(int b, int d)
 
 static int conf_keybd(int c, int d)
 {
-    return (d && c == SDLK_ESCAPE) ? goto_state(&st_title) : 1;
+    return (d && c & KEY_B) ? goto_state(&st_putt_title) : 1;
 }
 
 static int conf_buttn(int b, int d)
@@ -368,9 +402,9 @@ static int conf_buttn(int b, int d)
         if (config_tst_d(CONFIG_JOYSTICK_BUTTON_A, b))
             return conf_action(gui_token(gui_click()));
         if (config_tst_d(CONFIG_JOYSTICK_BUTTON_B, b))
-            return goto_state(&st_title);
+            return goto_state(&st_putt_title);
         if (config_tst_d(CONFIG_JOYSTICK_BUTTON_EXIT, b))
-            return goto_state(&st_title);
+            return goto_state(&st_putt_title);
     }
     return 1;
 }
@@ -405,7 +439,7 @@ static void null_leave(int id)
 
 /*---------------------------------------------------------------------------*/
 
-struct state st_conf = {
+struct state st_putt_conf = {
     conf_enter,
     conf_leave,
     conf_paint,
@@ -418,7 +452,7 @@ struct state st_conf = {
     1, 0
 };
 
-struct state st_null = {
+struct state st_putt_null = {
     null_enter,
     null_leave,
     NULL,

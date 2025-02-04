@@ -12,7 +12,6 @@
  * General Public License for more details.
  */
 
-#include <SDL.h>
 #include <math.h>
 
 #include "glext.h"
@@ -78,7 +77,7 @@ static void view_init(void)
     view_e[2][2] = 1.f;
 }
 
-void game_init(const char *s)
+void putt_game_init(const char *s)
 {
     jump_e = 1;
     jump_b = 0;
@@ -88,14 +87,14 @@ void game_init(const char *s)
                                     config_get_d(CONFIG_SHADOW));
 }
 
-void game_free(void)
+void putt_game_free(void)
 {
     sol_free(&file);
 }
 
 /*---------------------------------------------------------------------------*/
 
-static void game_draw_vect_prim(const struct s_file *fp, GLenum mode)
+static void putt_game_draw_vect_prim(const struct s_file *fp, int mode)
 {
     float p[3];
     float x[3];
@@ -107,56 +106,63 @@ static void game_draw_vect_prim(const struct s_file *fp, GLenum mode)
     v_cpy(z, view_e[2]);
 
     r = fp->uv[ball].r;
-    
+
+    glPolyFmt(POLY_ALPHA(16) | POLY_CULL_BACK);
     glBegin(mode);
     {
-        glColor4f(1.0f, 1.0f, 0.5f, 0.5f);
-        glVertex3f(p[0] - x[0] * r,
-                   p[1] - x[1] * r,
-                   p[2] - x[2] * r);
+        //glColor4f(1.0f, 1.0f, 0.5f, 0.5f);
+        glColor3b(255, 255, 128);
+        glVertex3f((p[0] - x[0] * r) / SCALE_VERTICES,
+                   (p[1] - x[1] * r) / SCALE_VERTICES,
+                   (p[2] - x[2] * r) / SCALE_VERTICES);
 
-        glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
-        glVertex3f(p[0] + z[0] * view_m,
-                   p[1] + z[1] * view_m,
-                   p[2] + z[2] * view_m);
+        //glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
+        glColor3b(255, 0, 0);
+        glVertex3f((p[0] + z[0] * view_m) / SCALE_VERTICES,
+                   (p[1] + z[1] * view_m) / SCALE_VERTICES,
+                   (p[2] + z[2] * view_m) / SCALE_VERTICES);
 
-        glColor4f(1.0f, 1.0f, 0.0f, 0.5f);
-        glVertex3f(p[0] + x[0] * r,
-                   p[1] + x[1] * r,
-                   p[2] + x[2] * r);
+        //glColor4f(1.0f, 1.0f, 0.0f, 0.5f);
+        glColor3b(255, 255, 0);
+        glVertex3f((p[0] + x[0] * r) / SCALE_VERTICES,
+                   (p[1] + x[1] * r) / SCALE_VERTICES,
+                   (p[2] + x[2] * r) / SCALE_VERTICES);
     }
     glEnd();
+    glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
 }
 
-static void game_draw_vect(const struct s_file *fp)
+static void putt_game_draw_vect(const struct s_file *fp)
 {
     if (view_m > 0.f)
     {
-        glPushAttrib(GL_TEXTURE_BIT);
-        glPushAttrib(GL_POLYGON_BIT);
-        glPushAttrib(GL_LIGHTING_BIT);
-        glPushAttrib(GL_DEPTH_BUFFER_BIT);
+        //glPushAttrib(GL_TEXTURE_BIT);
+        //glPushAttrib(GL_POLYGON_BIT);
+        //glPushAttrib(GL_LIGHTING_BIT);
+        //glPushAttrib(GL_DEPTH_BUFFER_BIT);
         {
-            glEnable(GL_COLOR_MATERIAL);
-            glDisable(GL_LIGHTING);
-            glDisable(GL_TEXTURE_2D);
-            glDepthMask(GL_FALSE);
+            //glEnable(GL_COLOR_MATERIAL);
+            //glDisable(GL_LIGHTING);
+            //glDisable(GL_TEXTURE_2D);
+            //glDepthMask(GL_FALSE);
+            glBindTexture(0, 0);
 
-            glEnable(GL_DEPTH_TEST);
-            game_draw_vect_prim(fp, GL_TRIANGLES);
+            //glEnable(GL_DEPTH_TEST);
+            putt_game_draw_vect_prim(fp, GL_TRIANGLES);
 
-            glDisable(GL_DEPTH_TEST);
-            game_draw_vect_prim(fp, GL_LINE_STRIP);
+            //glDisable(GL_DEPTH_TEST);
+            //putt_game_draw_vect_prim(fp, GL_LINE_STRIP);
         }
-        glPopAttrib();
-        glPopAttrib();
-        glPopAttrib();
-        glPopAttrib();
+        //glPopAttrib();
+        //glPopAttrib();
+        //glPopAttrib();
+        //glPopAttrib();
     }
 }
 
-static void game_draw_balls(const struct s_file *fp)
+static void putt_game_draw_balls(const struct s_file *fp)
 {
+    /*
     static const GLfloat color[5][4] = {
         { 1.0f, 1.0f, 1.0f, 0.7f },
         { 1.0f, 0.0f, 0.0f, 1.0f },
@@ -164,8 +170,17 @@ static void game_draw_balls(const struct s_file *fp)
         { 0.0f, 0.0f, 1.0f, 1.0f },
         { 1.0f, 1.0f, 0.0f, 1.0f },
     };
+    */
+    static const uint8_t color[5][4] = {
+        { 255, 255, 255, 179 },
+        { 255, 0,   0,   255 },
+        { 0,   255, 0,   255 },
+        { 0,   0,   255, 255 },
+        { 255, 255, 0,   255 },
+    };
 
     float M[16];
+    m4x4 Mf32;
     int ui;
 
     for (ui = curr_party(); ui > 0; ui--)
@@ -175,44 +190,48 @@ static void game_draw_balls(const struct s_file *fp)
             glPushMatrix();
             {
                 m_basis(M, fp->uv[ui].e[0], fp->uv[ui].e[1], fp->uv[ui].e[2]);
+                for (int i=0; i<16; i++)
+                    Mf32.m[i] = floattof32(M[i]);
 
-                glTranslatef(fp->uv[ui].p[0],
-                             fp->uv[ui].p[1] + BALL_FUDGE,
-                             fp->uv[ui].p[2]);
-                glMultMatrixf(M);
+                glTranslatef(fp->uv[ui].p[0] / SCALE_VERTICES,
+                             (fp->uv[ui].p[1] + BALL_FUDGE) / SCALE_VERTICES,
+                             fp->uv[ui].p[2] / SCALE_VERTICES);
+                glMultMatrix4x4(&Mf32);
                 glScalef(fp->uv[ui].r,
                          fp->uv[ui].r,
                          fp->uv[ui].r);
 
-                glColor4fv(color[ui]);
+                //glColor4fv(color[ui]);
+                glColor3b(color[ui][0], color[ui][1], color[ui][2]);
 
                 ball_draw();
             }
-            glPopMatrix();
+            glPopMatrix(1);
         }
         else
         {
             glPushMatrix();
             {
-                glTranslatef(fp->uv[ui].p[0],
-                             fp->uv[ui].p[1] - fp->uv[ui].r + BALL_FUDGE,
-                             fp->uv[ui].p[2]);
+                glTranslatef(fp->uv[ui].p[0] / SCALE_VERTICES,
+                             (fp->uv[ui].p[1] - fp->uv[ui].r + BALL_FUDGE) / SCALE_VERTICES,
+                             fp->uv[ui].p[2] / SCALE_VERTICES);
                 glScalef(fp->uv[ui].r,
                          fp->uv[ui].r,
                          fp->uv[ui].r);
 
-                glColor4f(color[ui][0],
-                          color[ui][1],
-                          color[ui][2], 0.5f);
+                //glColor4f(color[ui][0],
+                //          color[ui][1],
+                //          color[ui][2], 0.5f);
+                glColor3b(color[ui][0], color[ui][1], color[ui][2]);
 
                 mark_draw();
             }
-            glPopMatrix();
+            glPopMatrix(1);
         }
     }
 }
 
-static void game_draw_goals(const struct s_file *fp, float rx, float ry)
+static void putt_game_draw_goals(const struct s_file *fp, float rx, float ry)
 {
     int zi;
 
@@ -220,16 +239,16 @@ static void game_draw_goals(const struct s_file *fp, float rx, float ry)
     {
         glPushMatrix();
         {
-            glTranslatef(fp->zv[zi].p[0],
-                         fp->zv[zi].p[1],
-                         fp->zv[zi].p[2]);
+            glTranslatef(fp->zv[zi].p[0] / SCALE_VERTICES,
+                         fp->zv[zi].p[1] / SCALE_VERTICES,
+                         fp->zv[zi].p[2] / SCALE_VERTICES);
             flag_draw();
         }
-        glPopMatrix();
+        glPopMatrix(1);
     }
 }
 
-static void game_draw_jumps(const struct s_file *fp)
+static void putt_game_draw_jumps(const struct s_file *fp)
 {
     int ji;
 
@@ -237,18 +256,18 @@ static void game_draw_jumps(const struct s_file *fp)
     {
         glPushMatrix();
         {
-            glTranslatef(fp->jv[ji].p[0],
-                         fp->jv[ji].p[1],
-                         fp->jv[ji].p[2]);
+            glTranslatef(fp->jv[ji].p[0] / SCALE_VERTICES,
+                         fp->jv[ji].p[1] / SCALE_VERTICES,
+                         fp->jv[ji].p[2] / SCALE_VERTICES);
 
             glScalef(fp->jv[ji].r, 1.f, fp->jv[ji].r);
             jump_draw();
         }
-        glPopMatrix();
+        glPopMatrix(1);
     }
 }
 
-static void game_draw_swchs(const struct s_file *fp)
+static void putt_game_draw_swchs(const struct s_file *fp)
 {
     int xi;
 
@@ -256,22 +275,22 @@ static void game_draw_swchs(const struct s_file *fp)
     {
         glPushMatrix();
         {
-            glTranslatef(fp->xv[xi].p[0],
-                         fp->xv[xi].p[1],
-                         fp->xv[xi].p[2]);
+            glTranslatef(fp->xv[xi].p[0] / SCALE_VERTICES,
+                         fp->xv[xi].p[1] / SCALE_VERTICES,
+                         fp->xv[xi].p[2] / SCALE_VERTICES);
 
             glScalef(fp->xv[xi].r, 1.f, fp->xv[xi].r);
             swch_draw(fp->xv[xi].f);
         }
-        glPopMatrix();
+        glPopMatrix(1);
     }
 }
 
 /*---------------------------------------------------------------------------*/
 
-void game_draw(int pose)
+void putt_game_draw(int pose)
 {
-    const float light_p[4] = { 8.f, 32.f, 8.f, 1.f };
+    //const float light_p[4] = { 8.f, 32.f, 8.f, 1.f };
 
     const struct s_file *fp = &file;
     
@@ -280,7 +299,7 @@ void game_draw(int pose)
     if (jump_b) fov *= 2.0f * fabsf(jump_dt - 0.5f);
 
     config_push_persp(fov, 0.1f, FAR_DIST);
-    glPushAttrib(GL_LIGHTING_BIT);
+    //glPushAttrib(GL_LIGHTING_BIT);
     glPushMatrix();
     {
         float v[3], rx, ry;
@@ -290,22 +309,22 @@ void game_draw(int pose)
         rx = V_DEG(fatan2f(-v[1], fsqrtf(v[0] * v[0] + v[2] * v[2])));
         ry = V_DEG(fatan2f(+v[0], -v[2]));
 
-        glTranslatef(0.f, 0.f, -v_len(v));
+        glTranslatef(0.f, 0.f, -v_len(v) / SCALE_VERTICES);
         glRotatef(rx, 1.f, 0.f, 0.f);
         glRotatef(ry, 0.f, 1.f, 0.f);
-        glTranslatef(-view_c[0], -view_c[1], -view_c[2]);
+        glTranslatef(-view_c[0] / SCALE_VERTICES, -view_c[1] / SCALE_VERTICES, -view_c[2] / SCALE_VERTICES);
 
         /* Center the skybox about the position of the camera. */
 
         glPushMatrix();
         {
-            glTranslatef(view_p[0], view_p[1], view_p[2]);
+            glTranslatef(view_p[0] / SCALE_VERTICES, view_p[1] / SCALE_VERTICES, view_p[2] / SCALE_VERTICES);
             back_draw(0);
         }
-        glPopMatrix();
+        glPopMatrix(1);
 
-        glEnable(GL_LIGHT0);
-        glLightfv(GL_LIGHT0, GL_POSITION, light_p);
+        //glEnable(GL_LIGHT0);
+        //glLightfv(GL_LIGHT0, GL_POSITION, light_p);
 
         /* Draw the floor. */
 
@@ -321,26 +340,26 @@ void game_draw(int pose)
         /* Draw the game elements. */
 
         glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         if (pose == 0)
         {
-            game_draw_balls(fp);
-            game_draw_vect(fp);
+            putt_game_draw_balls(fp);
+            putt_game_draw_vect(fp);
         }
 
-        game_draw_goals(fp, -rx, -ry);
-        game_draw_jumps(fp);
-        game_draw_swchs(fp);
+        putt_game_draw_goals(fp, -rx, -ry);
+        putt_game_draw_jumps(fp);
+        putt_game_draw_swchs(fp);
     }
-    glPopMatrix();
-    glPopAttrib();
+    glPopMatrix(1);
+    //glPopAttrib();
     config_pop_matrix();
 }
 
 /*---------------------------------------------------------------------------*/
 
-void game_update_view(float dt)
+void putt_game_update_view(float dt)
 {
     const float y[3] = { 0.f, 1.f, 0.f };
 
@@ -407,7 +426,7 @@ void game_update_view(float dt)
     view_a = V_DEG(fatan2f(view_e[2][0], view_e[2][2]));
 }
 
-static int game_update_state(float dt)
+static int putt_game_update_state(float dt)
 {
     static float t = 0.f;
 
@@ -473,7 +492,7 @@ static int game_update_state(float dt)
  * graphics frame rate.
  */
 
-int game_step(const float g[3], float dt)
+int putt_game_step(const float g[3], float dt)
 {
     struct s_file *fp = &file;
 
@@ -507,11 +526,13 @@ int game_step(const float g[3], float dt)
     {
         /* Run the sim. */
 
+        /*
         while (t > MAX_DT && n < MAX_DN)
         {
             t /= 2;
             n *= 2;
         }
+        */
 
         for (i = 0; i < n; i++)
         {
@@ -529,11 +550,11 @@ int game_step(const float g[3], float dt)
             audio_play(AUD_BUMP, (float) (b - 0.5) * 2.0f);
     }
 
-    game_update_view(dt);
-    return game_update_state(st);
+    putt_game_update_view(dt);
+    return putt_game_update_state(st);
 }
 
-void game_putt(void)
+void putt_game_putt(void)
 {
     /*
      * HACK: The BALL_FUDGE here  guarantees that a putt doesn't drive
@@ -550,17 +571,17 @@ void game_putt(void)
 
 /*---------------------------------------------------------------------------*/
 
-void game_set_rot(int d)
+void putt_game_set_rot(int d)
 {
     view_a += (float) (30.f * d) / config_get_d(CONFIG_MOUSE_SENSE);
 }
 
-void game_clr_mag(void)
+void putt_game_clr_mag(void)
 {
     view_m = 1.f;
 }
 
-void game_set_mag(int d)
+void putt_game_set_mag(int d)
 {
     view_m -= (float) (1.f * d) / config_get_d(CONFIG_MOUSE_SENSE);
 
@@ -568,7 +589,7 @@ void game_set_mag(int d)
         view_m = 0.25;
 }
 
-void game_set_fly(float k)
+void putt_game_set_fly(float k)
 {
     struct s_file *fp = &file;
 
@@ -585,7 +606,7 @@ void game_set_fly(float k)
     v_cpy(view_e[1], y);
     v_sub(view_e[2], fp->uv[ball].p, fp->zv[0].p);
 
-    if (fabs(v_dot(view_e[1], view_e[2])) > 0.999)
+    if (fabsf(v_dot(view_e[1], view_e[2])) > 0.999f)
         v_cpy(view_e[2], z);
 
     v_crs(view_e[0], view_e[1], view_e[2]);
@@ -640,7 +661,7 @@ void game_set_fly(float k)
     view_a = V_DEG(fatan2f(view_e[2][0], view_e[2][2]));
 }
 
-void game_ball(int i)
+void putt_game_ball(int i)
 {
     int ui;
 
@@ -661,7 +682,7 @@ void game_ball(int i)
     }
 }
 
-void game_get_pos(float p[3], float e[3][3])
+void putt_game_get_pos(float p[3], float e[3][3])
 {
     v_cpy(p,    file.uv[ball].p);
     v_cpy(e[0], file.uv[ball].e[0]);
@@ -669,7 +690,7 @@ void game_get_pos(float p[3], float e[3][3])
     v_cpy(e[2], file.uv[ball].e[2]);
 }
 
-void game_set_pos(float p[3], float e[3][3])
+void putt_game_set_pos(float p[3], float e[3][3])
 {
     v_cpy(file.uv[ball].p,    p);
     v_cpy(file.uv[ball].e[0], e[0]);

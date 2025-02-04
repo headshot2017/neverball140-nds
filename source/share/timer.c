@@ -13,6 +13,11 @@ void timer_init(void)
 	time = 0;
 }
 
+void timer_free(void)
+{
+	timerStop(0);
+}
+
 uint64_t timer_get(void)
 {
 	uint32_t elapsed = timerElapsed(0);

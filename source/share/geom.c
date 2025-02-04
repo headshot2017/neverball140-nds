@@ -67,8 +67,6 @@ void ball_init(int b)
 	ball_list[++S] = palAddr;
 	ball_list[++S] = RGB15(6,6,6) + (RGB15(31,31,31) << 16);
 	ball_list[++S] = RGB15(31,31,31) + (RGB15(31,31,31) << 16);
-	ball_list[++S] = FIFO_COMMAND_PACK(FIFO_COLOR, FIFO_NOP, FIFO_NOP, FIFO_NOP);
-	ball_list[++S] = RGB15(31,31,31);
 
 	for (int i = 0; i < stacks; i++)
 	{
