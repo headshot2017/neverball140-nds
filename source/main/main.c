@@ -169,6 +169,36 @@ int main(int argc, char* argv[])
 			}
 			if (down & KEY_A)
 				break;
+
+			if (down & KEY_TOUCH)
+			{
+				int tapped = 0;
+
+				touchPosition touch;
+				touchRead(&touch);
+
+				int boxes[2][4] = {
+					{32, 70, 32+64, 70+64},
+					{160, 70, 160+64, 70+64}
+				};
+
+				for (int i=0; i<2; i++)
+				{
+					if (touch.px >= boxes[i][0] && touch.py >= boxes[i][1] && touch.px < boxes[i][2] && touch.py < boxes[i][3])
+					{
+						if (gameSelect != i)
+						{
+							gameSelect = i;
+							SetBG(i);
+						}
+						else
+							tapped = 1;
+					}
+				}
+
+				if (tapped)
+					break;
+			}
 		}
 
 		FadeToBlack();
