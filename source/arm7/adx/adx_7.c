@@ -100,7 +100,7 @@ static int adx_frame()
 {
 	// Do not decode any frames if the decoder
 	// is asking for more data from the file.
-	if (adx->flag == 1)
+	if (adx->flag >= 1)
 		return 0;
 
 	unsigned char *left = (unsigned char*)adx->audioLeft;
@@ -169,7 +169,7 @@ static int adx_frame()
 
 static void adx_frames(DSTIME endtime, u8 firstFrames)
 {
-	while (paintedtime < endtime)
+	while (adx_state == ADX_PLAYING && paintedtime < endtime && adx->flag != 2)
 	{
 		if (firstFrames && adx->flag == 1)
 			break;
@@ -183,9 +183,8 @@ static void adx_frames(DSTIME endtime, u8 firstFrames)
 		{
 			adx_readPtr -= ADX_FILE_BUFFER_SIZE;
 			memcpy((void *)adx_readPtr, (void *)(adx_readPtr + ADX_FILE_BUFFER_SIZE), ADX_FILE_BUFFER_SIZE - (adx_readPtr-adx->buffer));
-			if (adx->flag == 1)
-				break;
-			adx->flag = 1;
+			if (adx->flag < 2)
+				adx->flag++;
 		}
 	}
 }

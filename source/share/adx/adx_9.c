@@ -116,6 +116,7 @@ void adx_update()
 	switch(adx->flag)
 	{
 		case 1: // stream more adx data
+		case 2:
 			// adx->buffer has two buffer chunks (ADX_FILE_BUFFER_SIZE*2)
 			// read the data into the 2nd chunk
 			n = fread((void *)(adx->buffer + ADX_FILE_BUFFER_SIZE), 1, ADX_FILE_BUFFER_SIZE, adx_in);
@@ -188,7 +189,7 @@ int adx_play(const char* adx_file, int loop_enable)
 
 	fifoSendDatamsg(FIFO_USER_01, sizeof(msg), (u8*)&msg);
 
-	int timeout = 60*3;
+	int timeout = 60*2;
 	while (!fifoCheckValue32(FIFO_USER_01) && --timeout)
 		swiWaitForVBlank();
 
@@ -225,13 +226,14 @@ int adx_set_volume(int volume)
 {
 	if (!adx || !adx_in) return 0;
 
+    int timeout = 60*2;
 	adx_msg msg;
 
 	msg.type = ADX_MSG_VOLUME;
 	msg.volume = volume;
 
 	fifoSendDatamsg(FIFO_USER_01, sizeof(msg), (u8*)&msg);
-	while(!fifoCheckValue32(FIFO_USER_01));
+	while(!fifoCheckValue32(FIFO_USER_01) && (timeout--) > 0) swiWaitForVBlank();
 
 	return (int)fifoGetValue32(FIFO_USER_01);
 }
@@ -255,12 +257,13 @@ int adx_stop()
 {
 	if (!adx || !adx_in) return 1;
 
+    int timeout = 60*2;
     adx_msg msg;
 
 	msg.type = ADX_MSG_STOP;
 
 	fifoSendDatamsg(FIFO_USER_01, sizeof(msg), (u8*)&msg);
-	while(!fifoCheckValue32(FIFO_USER_01));
+	while(!fifoCheckValue32(FIFO_USER_01) && (timeout--) > 0) swiWaitForVBlank();
 
 	int ret = (int)fifoGetValue32(FIFO_USER_01);
 
