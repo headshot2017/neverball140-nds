@@ -120,6 +120,11 @@ void ball_free(void)
     ball_text = 0;
 }
 
+void ball_set_color(unsigned char r, unsigned char g, unsigned char b)
+{
+    ball_list[4] = RGB15(6,6,6) + (RGB15(r>>3,g>>3,b>>3) << 16);
+}
+
 void ball_draw(void)
 {
 	/*

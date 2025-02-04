@@ -17,6 +17,7 @@
 
 void ball_init(int);
 void ball_free(void);
+void ball_set_color(unsigned char, unsigned char, unsigned char);
 void ball_draw(void);
 
 /*---------------------------------------------------------------------------*/

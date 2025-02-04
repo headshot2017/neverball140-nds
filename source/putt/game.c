@@ -202,7 +202,7 @@ static void putt_game_draw_balls(const struct s_file *fp)
                          fp->uv[ui].r);
 
                 //glColor4fv(color[ui]);
-                glColor3b(color[ui][0], color[ui][1], color[ui][2]);
+                ball_set_color(color[ui][0], color[ui][1], color[ui][2]);
 
                 ball_draw();
             }
@@ -526,13 +526,11 @@ int putt_game_step(const float g[3], float dt)
     {
         /* Run the sim. */
 
-        /*
         while (t > MAX_DT && n < MAX_DN)
         {
             t /= 2;
             n *= 2;
         }
-        */
 
         for (i = 0; i < n; i++)
         {
