@@ -219,6 +219,9 @@ int putt_main(int argc, char *argv[])
 	consoleInit(NULL, 1, BgType_Text4bpp, BgSize_T_256x256, 14, 0, false, true);
 	consoleDebugInit(DebugDevice_NOCASH);
 
+	REG_BLDCNT = BLEND_NONE;
+	REG_BLDCNT_SUB = BLEND_NONE;
+
 	int camera = 0;
 
 	srand((int) time(NULL));
@@ -273,7 +276,7 @@ int putt_main(int argc, char *argv[])
 
 					while (loop())
 						//if ((t1 = timer_get()) > t0)
-						{
+                        {
 							t1 = timer_get();
 							if (config_get_pause())
 							{
@@ -307,9 +310,11 @@ int putt_main(int argc, char *argv[])
 			}
 			//else fprintf(stderr, "%s: %s\n", argv[0], SDL_GetError());
 		}
-		//else fprintf(stderr, "Failure to establish config directory\n");
+		else fprintf(stderr, "Failure to establish config directory\n");
 	}
-	//else fprintf(stderr, "Failure to establish game data directory\n");
+	else fprintf(stderr, "Failure to establish game data directory\n");
+
+	goto_state(&st_putt_null);
 
 	consoleClear();
 	consoleSelect(NULL);

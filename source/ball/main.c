@@ -265,113 +265,118 @@ int ball_main(int argc, char *argv[])
 	consoleInit(NULL, 1, BgType_Text4bpp, BgSize_T_256x256, 14, 0, false, true);
 	consoleDebugInit(DebugDevice_NOCASH);
 
+	REG_BLDCNT = BLEND_NONE;
+	REG_BLDCNT_SUB = BLEND_NONE;
 
-    if (config_data_path((argc > 1 ? argv[1] : NULL), SET_FILE))
-    {
-        if (config_user_path(NULL))
-        {
-            //if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK))
-            {
+
+	if (config_data_path((argc > 1 ? argv[1] : NULL), SET_FILE))
+	{
+		if (config_user_path(NULL))
+		{
+			//if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK))
+			{
 				//SDL_Joystick *joy = NULL;
 
 				printf("config init\n");
-                config_init();
+				config_init();
 				printf("config load\n");
-                config_load();
+				config_load();
 				printf("config done\n");
 
-                /* Initialize the joystick. */
+				/* Initialize the joystick. */
 
 				/*
-                if (SDL_NumJoysticks() > 0)
-                {
-                    joy=SDL_JoystickOpen(config_get_d(CONFIG_JOYSTICK_DEVICE));
-                    if (joy)
-                        SDL_JoystickEventState(SDL_ENABLE);
-                }
+				if (SDL_NumJoysticks() > 0)
+				{
+					joy=SDL_JoystickOpen(config_get_d(CONFIG_JOYSTICK_DEVICE));
+					if (joy)
+						SDL_JoystickEventState(SDL_ENABLE);
+				}
 				*/
 
-                /* Initialize the audio. */
+				/* Initialize the audio. */
 
-                audio_bind(AUD_MENU,   3, "snd/menu.wav");
-                audio_bind(AUD_START,  1, "snd/select.wav");
-                audio_bind(AUD_READY,  1, "snd/ready.wav");
-                audio_bind(AUD_SET,    1, "snd/set.wav");
-                audio_bind(AUD_GO,     1, "snd/go.wav");
-                audio_bind(AUD_BALL,   2, "snd/ball.wav");
-                audio_bind(AUD_BUMP,   3, "snd/bump.wav");
-                audio_bind(AUD_COIN,   2, "snd/coin.wav");
-                audio_bind(AUD_TICK,   4, "snd/tick.wav");
-                audio_bind(AUD_TOCK,   4, "snd/tock.wav");
-                audio_bind(AUD_SWITCH, 5, "snd/switch.wav");
-                audio_bind(AUD_JUMP,   5, "snd/jump.wav");
-                audio_bind(AUD_GOAL,   5, "snd/goal.wav");
-                audio_bind(AUD_SCORE,  1, "snd/record.wav");
-                audio_bind(AUD_FALL,   1, "snd/fall.wav");
-                audio_bind(AUD_TIME,   1, "snd/time.wav");
-                audio_bind(AUD_OVER,   1, "snd/over.wav");
+				audio_bind(AUD_MENU,   3, "snd/menu.wav");
+				audio_bind(AUD_START,  1, "snd/select.wav");
+				audio_bind(AUD_READY,  1, "snd/ready.wav");
+				audio_bind(AUD_SET,    1, "snd/set.wav");
+				audio_bind(AUD_GO,     1, "snd/go.wav");
+				audio_bind(AUD_BALL,   2, "snd/ball.wav");
+				audio_bind(AUD_BUMP,   3, "snd/bump.wav");
+				audio_bind(AUD_COIN,   2, "snd/coin.wav");
+				audio_bind(AUD_TICK,   4, "snd/tick.wav");
+				audio_bind(AUD_TOCK,   4, "snd/tock.wav");
+				audio_bind(AUD_SWITCH, 5, "snd/switch.wav");
+				audio_bind(AUD_JUMP,   5, "snd/jump.wav");
+				audio_bind(AUD_GOAL,   5, "snd/goal.wav");
+				audio_bind(AUD_SCORE,  1, "snd/record.wav");
+				audio_bind(AUD_FALL,   1, "snd/fall.wav");
+				audio_bind(AUD_TIME,   1, "snd/time.wav");
+				audio_bind(AUD_OVER,   1, "snd/over.wav");
 
 				printf("audio init\n");
-                audio_init();
+				audio_init();
 				printf("audio done\n");
 
 				timer_init();
 
-                /* Initialize the video. */
+				/* Initialize the video. */
 
-                if (config_mode(config_get_d(CONFIG_FULLSCREEN),
-                                256,
-                                192))
-                {
+				if (config_mode(config_get_d(CONFIG_FULLSCREEN),
+								256,
+								192))
+				{
 					printf("video inited\n");
-                    int t1, t0 = timer_get();
+					int t1, t0 = timer_get();
 
-                    /* Initialize the run state and the title display. */
+					/* Initialize the run state and the title display. */
 
-                    init_state(&st_null);
-                    goto_state(&st_title);
+					init_state(&st_null);
+					goto_state(&st_title);
 
-                    /* Run the main game loop. */
+					/* Run the main game loop. */
 
-                    while (loop())
-                        //if ((t1 = timer_get()) > t0)
-                        {
-                            t1 = timer_get();
-                            if (config_get_pause())
-                            {
-                                st_paint();
-                                gui_blank();
-                            }
-                            else
-                            {
-                                st_timer((t1 - t0) / 1000.f);
-                                st_paint();
-                            }
-                            adx_update();
-                            glFlush(0);
+					while (loop())
+						//if ((t1 = timer_get()) > t0)
+						{
+							t1 = timer_get();
+							if (config_get_pause())
+							{
+								st_paint();
+								gui_blank();
+							}
+							else
+							{
+								st_timer((t1 - t0) / 1000.f);
+								st_paint();
+							}
+							adx_update();
+							glFlush(0);
 
-                            t0 = t1;
+							t0 = t1;
 
-                            //if (config_get_d(CONFIG_NICE))
-                                //SDL_Delay(1);
-                        }
-                }
-                //else fprintf(stderr, "%s: %s\n", argv[0], SDL_GetError());
+							//if (config_get_d(CONFIG_NICE))
+								//SDL_Delay(1);
+						}
+				}
+				//else fprintf(stderr, "%s: %s\n", argv[0], SDL_GetError());
 
-                audio_free();
-                config_save();
-                timer_free();
+				audio_free();
+				config_save();
+				timer_free();
 
-                //if (SDL_JoystickOpened(0))
-                    //SDL_JoystickClose(joy);
+				//if (SDL_JoystickOpened(0))
+					//SDL_JoystickClose(joy);
 
-                //SDL_Quit();
-            }
-            //else fprintf(stderr, "%s: %s\n", argv[0], SDL_GetError());
-        }
-        else fprintf(stderr, "Failure to establish config directory\n");
-    }
-    else fprintf(stderr, "Failure to establish game data directory\n");
+				//SDL_Quit();
+			}
+			//else fprintf(stderr, "%s: %s\n", argv[0], SDL_GetError());
+		}
+		else fprintf(stderr, "Failure to establish config directory\n");
+	}
+	else fprintf(stderr, "Failure to establish game data directory\n");
+
+	goto_state(&st_null);
 
 	consoleClear();
 	consoleSelect(NULL);
@@ -383,7 +388,7 @@ int ball_main(int argc, char *argv[])
 	dmaFillHalfWords(0, VRAM_D, 131072);
 	dmaFillHalfWords(0, VRAM_H, 32768);
 
-    return 0;
+	return 0;
 }
 
 /*---------------------------------------------------------------------------*/

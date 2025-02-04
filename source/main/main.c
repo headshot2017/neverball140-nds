@@ -103,9 +103,6 @@ static void FadeToBlack()
 		if (alpha == 16)
 			break;
 	}
-
-	REG_BLDCNT = BLEND_NONE;
-	REG_BLDCNT_SUB = BLEND_NONE;
 }
 
 int main(int argc, char* argv[])
